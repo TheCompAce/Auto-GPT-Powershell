@@ -9,7 +9,9 @@ Param(
     [int]$LoopCount,
     [bool]$Debug,
     [string]$StartingPrompt,
-    [string]$SystemPrompt
+    [string]$SystemPrompt,
+    [string]$StartPromptFilePath,
+    [string]$SystemPromptFilePath
 )
 
 # Check if settings.json exists, create it with default settings if it doesn't
@@ -55,8 +57,10 @@ Remove-Item -Path "session.txt" -ErrorAction Ignore
 Remove-Item -Path "system.log" -ErrorAction Ignore
 
 # Set initial prompt
-if (-not $StartingPrompt -and (($Settings.UseChatGPT -and ($Settings.OpenAiModel -eq "gpt-3.5-turbo" -or $Settings.OpenAiModel -eq "gpt-4")))) {
+if (-not $StartingPrompt -and (-not $StartPromptFilePath) -and (($Settings.UseChatGPT -and ($Settings.OpenAiModel -eq "gpt-3.5-turbo" -or $Settings.OpenAiModel -eq "gpt-4")))) {
     $prompt = Read-Host "Enter the starting prompt"
+} elseif ($StartPromptFilePath) {
+    $prompt = Get-Content -Path $StartPromptFilePath -Raw
 } else {
     $prompt = $StartingPrompt
 }
@@ -65,17 +69,19 @@ if ($Settings.Debug) {
     Write-Host "Start Prompt: $($prompt)"
 } 
 
-if ($Settings.UseChatGPT -and $Settings.OpenAiModel -ne "text-davinci-003") {
-    if ($Settings.UseChatGPT -and ($Settings.OpenAiModel -eq "gpt-3.5-turbo" -or $Settings.OpenAiModel -eq "gpt-4") -and (-not $SystemPrompt)) {
+if ($Settings.UseChatGPT -and ($Settings.OpenAiModel -eq "gpt-3.5-turbo" -or $Settings.OpenAiModel -eq "gpt-4")) {
+    if (-not $SystemPrompt -and (-not $SystemPromptFilePath)) {
         $startSystem = Read-Host "Enter the start system"
+    } elseif ($SystemPromptFilePath) {
+        $startSystem = Get-Content -Path $SystemPromptFilePath -Raw
     } else {
         $startSystem = $SystemPrompt
     }
-    
-    if ($Settings.Debug) {
-        Write-Host "Start System: $($startSystem)"
-    } 
 }
+
+if ($Settings.Debug) {
+    Write-Host "Start System: $($startSystem)"
+} 
 
 # Run start plugins
 . .\modules\RunStartPlugins.ps1
