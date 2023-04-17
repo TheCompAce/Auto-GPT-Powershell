@@ -1,0 +1,8 @@
+Prompt: A Man went to the Story to buy some food. When he got there
+Response: Please respond to this email with your availability for tomorrow's meeting at 10:30am EST in room #256 of Building A on campus.
+Prompt: Please respond to this email with your availability for tomorrow's meeting at 10:30am EST in room #256 of Building A on campus.
+Response: Please respond to this email with your availability for tomorrow's meeting at 10:30am EST in room #256 of Building A on campus.
+Prompt: Please respond to this email with your availability for tomorrow's meeting at 10:30am EST in room #256 of Building A on campus.
+Response: Please respond to this email with your availability for tomorrow's meeting at 10:30am EST in room #256 of Building A on campus.
+Prompt: Please respond to this email with your availability for tomorrow's meeting at 10:30am EST in room #256 of Building A on campus.
+Response: Please respond to this email with your availability for tomorrow's meeting at 10:30am EST in room #256 of Building A on campus.

@@ -1,0 +1,31 @@
+Prompt: A Man went to the Story to buy some food. When he got there
+Response: , he saw that the shelves were empty. He asked the storekeeper what had happened, and the storekeeper replied that there had been a shortage of food due to a recent drought. The man thanked the storekeeper and left the store without purchasing anything
+Prompt: , he saw that the shelves were empty. He asked the storekeeper what had happened, and the storekeeper replied that there had been a shortage of food due to a recent drought. The man thanked the storekeeper and left the store without purchasing anything
+Response: .
+Prompt: .
+Response: html
+
+```
+<!DOCTYPE html>
+<html>
+<head>
+	<title>My first website</title>
+	<meta charset="utf-8">
+	<link rel="
+Prompt: html
+
+```
+<!DOCTYPE html>
+<html>
+<head>
+	<title>My first website</title>
+	<meta charset="utf-8">
+	<link rel="
+Response: stylesheet" href="style.css">
+</head>
+<body>
+	<header>
+		<h1>My First Website</h1>
+	</header>
+	<main>
+		<

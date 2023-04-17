@@ -7,7 +7,7 @@ function ShowOptions {
     Write-Host "1. Change Model ($($Settings.model))"
     Write-Host "2. Toggle Pause ($($Settings.pause))"
     Write-Host "3. Change Seed ($($Settings.seed))"
-    Write-Host "4. Change Loop Count ($($Settings.LoopCt))"
+    Write-Host "4. Change Loop Count ($($Settings.LoopCount))"
     Write-Host "5. Toggle Use ChatGPT ($($Settings.UseChatGPT))"
     Write-Host "6. Set OpenAI Key ($($Settings.OpenAIKey))"
     Write-Host "7. OpenAI Models ($($Settings.OpenAiModel))"
@@ -41,7 +41,7 @@ while ($true) {
         }
         2 { $Settings.pause = if ($Settings.pause -eq 'y') { 'n' } else { 'y' } }
         3 { $Settings.seed = Read-Host "Enter the seed value (leave empty to use seed created on start, or '0' for random every time)" }
-        4 { $Settings.LoopCt = Read-Host "Enter the Loop Count (leave empty for infinite)" }
+        4 { $Settings.LoopCount = Read-Host "Enter the Loop Count (leave empty for infinite)" }
         5 { $Settings.UseChatGPT = -not $Settings.UseChatGPT }
         6 { $Settings.OpenAIKey = Read-Host "Enter your OpenAI API Key" }
         7 {

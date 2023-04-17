@@ -16,6 +16,7 @@ if (-not (Test-Path "settings.json")) {
         model = "gpt4all-lora-quantized.bin"
         pause = "y"
         seed = ""
+        LoopCount = "10"
         UseChatGPT = $false
         OpenAIKey = ""
         OpenAiModel = "gpt-3.5-turbo"
@@ -69,7 +70,7 @@ if ($Settings.UseChatGPT -and $Settings.OpenAiModel -ne "text-davinci-003") {
 . .\modules\RunStartPlugins.ps1
 
 
-
+$runCt = 0
 # Main loop
 do {
 
@@ -123,4 +124,6 @@ do {
     if ($settings.pause.ToLower() -eq "y") {
         $null = Read-Host "Press Enter to continue, or Ctrl+C to exit"
     }
-} while ($true)
+
+    $runCt++
+} while ($true -and $runCt -lt $settings.LoopCount)
