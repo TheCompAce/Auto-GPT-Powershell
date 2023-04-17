@@ -12,7 +12,8 @@ function ShowOptions {
     Write-Host "6. Set OpenAI Key ($($Settings.OpenAIKey))"
     Write-Host "7. OpenAI Models ($($Settings.OpenAiModel))"
     Write-Host "8. Turn On Debug ($($Settings.Debug))"
-    Write-Host "9. Exit"
+    Write-Host "9. Allow GPT in plugins ($($Settings.AllowPluginGPTs))"
+    Write-Host "10. Exit"
 }
 
 function ShowLocalModels {
@@ -32,7 +33,7 @@ function ShowOpenAIModels {
 
 while ($true) {
     ShowOptions
-    $option = Read-Host "Choose an option (1-9):"
+    $option = Read-Host "Choose an option (1-10):"
 
     switch ($option) {
         1 {
@@ -50,7 +51,8 @@ while ($true) {
             $Settings.OpenAiModel = $oaModels[$modelIndex - 1]
         }
         8 { $Settings.Debug = -not $Settings.Debug }
-        9 { return }
+        9 { $Settings.AllowPluginGPTs = -not $Settings.AllowPluginGPTs }
+        10 { return }
         default { Write-Host "Invalid option" }
     }
 

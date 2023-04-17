@@ -11,8 +11,22 @@ Param(
     [string]$StartingPrompt,
     [string]$SystemPrompt,
     [string]$StartPromptFilePath,
-    [string]$SystemPromptFilePath
+    [string]$SystemPromptFilePath,
+    [bool]$AllowPluginGPTs,
+    [string]$SessionFolder,
+    [string]$SessionFile
 )
+
+# Create the "sessions" folder if it doesn't exist
+if (-not (Test-Path "sessions")) {
+    New-Item -ItemType Directory -Path "sessions" | Out-Null
+}
+
+if ([string]::IsNullOrEmpty($SessionFolder)) {
+    $SessionFolder = "sessions/"
+}
+
+
 
 # Check if settings.json exists, create it with default settings if it doesn't
 if (-not (Test-Path "settings.json")) {
@@ -25,6 +39,7 @@ if (-not (Test-Path "settings.json")) {
         OpenAIKey = ""
         OpenAiModel = "gpt-3.5-turbo"
         Debug = $false
+        AllowPluginGPTs = $false
     } | ConvertTo-Json -Depth 10 | Set-Content -Path "settings.json"
 }
 
@@ -51,6 +66,7 @@ if (-not ($model -or $pause -or $seed -or $UseChatGPT -or $OpenAIKey -or $OpenAi
     }
 }
 
+. .\modules\General.ps1
 
 # Remove existing log files
 Remove-Item -Path "session.txt" -ErrorAction Ignore
@@ -77,6 +93,11 @@ if ($Settings.UseChatGPT -and ($Settings.OpenAiModel -eq "gpt-3.5-turbo" -or $Se
     } else {
         $startSystem = $SystemPrompt
     }
+}
+
+if ([string]::IsNullOrEmpty($SessionFile)) {
+    $timestamp = Get-Date -Format "yyyyMMdd-HHmmss"
+    $SessionFile = "$($SessionFolder)session_$($timestamp).txt"
 }
 
 if ($Settings.Debug) {
