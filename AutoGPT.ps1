@@ -7,7 +7,9 @@ Param(
     [string]$OpenAIKey,
     [string]$OpenAiModel,
     [int]$LoopCount,
-    [bool]$Debug
+    [bool]$Debug,
+    [string]$StartingPrompt,
+    [string]$SystemPrompt
 )
 
 # Check if settings.json exists, create it with default settings if it doesn't
@@ -53,14 +55,23 @@ Remove-Item -Path "session.txt" -ErrorAction Ignore
 Remove-Item -Path "system.log" -ErrorAction Ignore
 
 # Set initial prompt
-$prompt = Read-Host "Enter the starting prompt"
+if (-not $StartingPrompt -and (($Settings.UseChatGPT -and ($Settings.OpenAiModel -eq "gpt-3.5-turbo" -or $Settings.OpenAiModel -eq "gpt-4")))) {
+    $prompt = Read-Host "Enter the starting prompt"
+} else {
+    $prompt = $StartingPrompt
+}
 
 if ($Settings.Debug) {
     Write-Host "Start Prompt: $($prompt)"
 } 
 
 if ($Settings.UseChatGPT -and $Settings.OpenAiModel -ne "text-davinci-003") {
-    $startSystem = Read-Host "Enter the start system"
+    if ($Settings.UseChatGPT -and ($Settings.OpenAiModel -eq "gpt-3.5-turbo" -or $Settings.OpenAiModel -eq "gpt-4") -and (-not $SystemPrompt)) {
+        $startSystem = Read-Host "Enter the start system"
+    } else {
+        $startSystem = $SystemPrompt
+    }
+    
     if ($Settings.Debug) {
         Write-Host "Start System: $($startSystem)"
     } 
