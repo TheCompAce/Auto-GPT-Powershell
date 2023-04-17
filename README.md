@@ -11,10 +11,10 @@ AutoGPT_PS is a PowerShell script that runs GPT-4, processes user input, and ret
 ## Options
 
 1. **Change Model**: Allows selection of a .bin file to use for GPT4All. Example: `gpt4all-lora-quantized.bin`.
-2. **Toggle Pause**: Enables or disables pausing after every iteration of the main loop. Default value: `y` (no pause).
+2. **Toggle Pause**: Enables or disables pausing after every iteration of the main loop. Default value: `y` (pause).
 3. **Change Seed**: Sets the seed value for GPT4All. Default value: `` (use the first generated seed) ('0' will use a random seed everytime.).
-4. **Change Loop Count**: Sets the number of loops for the main loop. Default value: `10` (four loops).
-5. **Toggle Use ChatGPT**: Enables or disables the use of the OpenAI Chat API. Default value: `False` (enabled).
+4. **Change Loop Count**: Sets the number of loops for the main loop. Default value: `10` (ten loops).
+5. **Toggle Use ChatGPT**: Enables or disables the use of the OpenAI Chat API. Default value: `False` (disabled).
 6. **Set OpenAI Key**: Sets the OpenAI API key.
 7. **OpenAI Models**: Allows selection of an OpenAI model from the available options: `text-davinci-003`, `gpt-3.5-turbo`, and `gpt-4`. Default value: `text-davinci-003`.
 8. **Turn On Debug**: Enables or disables debug messages at most steps of the scripts. Default value: `False` (disabled).
