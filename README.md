@@ -5,7 +5,7 @@ AutoGPT is a compact, modular, and user-friendly PowerShell interface for text g
 The script is organized into several files:
 - AutoGPT.ps1: The main script
 - modules/Options.ps1: Handles user settings and options
-- modules/ParseOutput.ps1: Parses the output from GPT-4 or ChatGPT API
+- modules/ParseOutput.ps1: Parses the output from GPT-4 executable
 - modules/RunChatGPTAPI.ps1: Executes the ChatGPT API call
 - modules/RunGPT4Exe.ps1: Executes the GPT-4 executable
 - modules/RunInputPlugins.ps1: A plugin system for processing input
