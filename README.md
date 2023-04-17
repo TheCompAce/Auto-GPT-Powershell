@@ -6,6 +6,7 @@ AutoGPT_PS is a PowerShell script that runs GPT-4, processes user input, and ret
 
 1. Download the AutoGPT_PS repository.
 2. Place the GPT-4 model file (in .bin format) in the same directory as the AutoGPT.ps1 script.
+   (Note: the "gpt4all-lora-quantized.bin" is fake, and you will need to find it on the web, I will not provide the model.)
 3. Run the AutoGPT.ps1 script.
 
 ## Options
