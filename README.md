@@ -1,0 +1,2 @@
+# Auto-GPT Powershell
+ AutoGPT is a compact, modular, and user-friendly PowerShell interface for text generation with GPT-4 language models or OpenAI's API. It supports offline usage with GPT4All and offers customizable plugins for input, output, and startup configurations. Users can seamlessly switch between local GPT-4 models and OpenAI API integration, with preferences stored in a JSON settings file.
