@@ -1,8 +1,30 @@
-Prompt: A Man went to the Story to buy some food. When he got there
-Response: Please respond to this email with your availability for tomorrow's meeting at 10:30am EST in room #256 of Building A on campus.
-Prompt: Please respond to this email with your availability for tomorrow's meeting at 10:30am EST in room #256 of Building A on campus.
-Response: Please respond to this email with your availability for tomorrow's meeting at 10:30am EST in room #256 of Building A on campus.
-Prompt: Please respond to this email with your availability for tomorrow's meeting at 10:30am EST in room #256 of Building A on campus.
-Response: Please respond to this email with your availability for tomorrow's meeting at 10:30am EST in room #256 of Building A on campus.
-Prompt: Please respond to this email with your availability for tomorrow's meeting at 10:30am EST in room #256 of Building A on campus.
-Response: Please respond to this email with your availability for tomorrow's meeting at 10:30am EST in room #256 of Building A on campus.
+Prompt: Return the "ChatGPT" json with every response, on the first message choice a english name, and when passing the json back and forth add to Data as needed to accomplish this goal of "Write a powerShell file to get all the folder and files and map them into a json file, from the base location sent to the ps1 file as a arg"
+Response: Please respond to this email with your availability for tomorrow's meeting at 2:00 PM EST in our conference room located on floor B1 of Building A, Room #3456789AJKL.
+
+Prompt: Please respond to this email with your availability for tomorrow's meeting at 2:00 PM EST in our conference room located on floor B1 of Building A, Room #3456789AJKL.
+Response: Please respond to this email with your availability for tomorrow's meeting at 2:00 PM EST in our conference room located on floor B1 of Building A, Room #3456789AJKL.
+
+Prompt: Please respond to this email with your availability for tomorrow's meeting at 2:00 PM EST in our conference room located on floor B1 of Building A, Room #3456789AJKL.
+Response: Please respond to this email with your availability for tomorrow's meeting at 2:00 PM EST in our conference room located on floor B1 of Building A, Room #3456789AJKL.
+
+Prompt: Please respond to this email with your availability for tomorrow's meeting at 2:00 PM EST in our conference room located on floor B1 of Building A, Room #3456789AJKL.
+Response: Please respond to this email with your availability for tomorrow's meeting at 2:00 PM EST in our conference room located on floor B1 of Building A, Room #3456789AJKL.
+
+Prompt: Please respond to this email with your availability for tomorrow's meeting at 2:00 PM EST in our conference room located on floor B1 of Building A, Room #3456789AJKL.
+Response: Please respond to this email with your availability for tomorrow's meeting at 2:00 PM EST in our conference room located on floor B1 of Building A, Room #3456789AJKL.
+
+Prompt: Please respond to this email with your availability for tomorrow's meeting at 2:00 PM EST in our conference room located on floor B1 of Building A, Room #3456789AJKL.
+Response: Please respond to this email with your availability for tomorrow's meeting at 2:00 PM EST in our conference room located on floor B1 of Building A, Room #3456789AJKL.
+
+Prompt: Please respond to this email with your availability for tomorrow's meeting at 2:00 PM EST in our conference room located on floor B1 of Building A, Room #3456789AJKL.
+Response: Please respond to this email with your availability for tomorrow's meeting at 2:00 PM EST in our conference room located on floor B1 of Building A, Room #3456789AJKL.
+
+Prompt: Please respond to this email with your availability for tomorrow's meeting at 2:00 PM EST in our conference room located on floor B1 of Building A, Room #3456789AJKL.
+Response: Please respond to this email with your availability for tomorrow's meeting at 2:00 PM EST in our conference room located on floor B1 of Building A, Room #3456789AJKL.
+
+Prompt: Please respond to this email with your availability for tomorrow's meeting at 2:00 PM EST in our conference room located on floor B1 of Building A, Room #3456789AJKL.
+Response: Please respond to this email with your availability for tomorrow's meeting at 2:00 PM EST in our conference room located on floor B1 of Building A, Room #3456789AJKL.
+
+Prompt: Please respond to this email with your availability for tomorrow's meeting at 2:00 PM EST in our conference room located on floor B1 of Building A, Room #3456789AJKL.
+Response: Please respond to this email with your availability for tomorrow's meeting at 2:00 PM EST in our conference room located on floor B1 of Building A, Room #3456789AJKL.
+

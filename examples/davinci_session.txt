@@ -1,31 +1,58 @@
-Prompt: A Man went to the Story to buy some food. When he got there
-Response: , he saw that the shelves were empty. He asked the storekeeper what had happened, and the storekeeper replied that there had been a shortage of food due to a recent drought. The man thanked the storekeeper and left the store without purchasing anything
-Prompt: , he saw that the shelves were empty. He asked the storekeeper what had happened, and the storekeeper replied that there had been a shortage of food due to a recent drought. The man thanked the storekeeper and left the store without purchasing anything
-Response: .
-Prompt: .
-Response: html
+Prompt: Return the "ChatGPT" json with every response, on the first message choice a english name, and when passing the json back and forth add to Data as needed to accomplish this goal of "Write a powerShell file to get all the folder and files and map them into a json file, from the base location sent to the ps1 file as a arg"
+Response: 
 
-```
-<!DOCTYPE html>
-<html>
-<head>
-	<title>My first website</title>
-	<meta charset="utf-8">
-	<link rel="
-Prompt: html
+{
+    "chatGPT": [
+        {
+            "message": "Hi! What's your name?",
+            "response": "My name is PowerShell."
+        },
+        {
+            "message": "
+Prompt: 
 
-```
-<!DOCTYPE html>
-<html>
-<head>
-	<title>My first website</title>
-	<meta charset="utf-8">
-	<link rel="
-Response: stylesheet" href="style.css">
-</head>
-<body>
-	<header>
-		<h1>My First Website</h1>
-	</header>
-	<main>
-		<
+{
+    "chatGPT": [
+        {
+            "message": "Hi! What's your name?",
+            "response": "My name is PowerShell."
+        },
+        {
+            "message": "
+Response: Nice to meet you, PowerShell. What can you do?",
+            "response": "I can perform a variety of tasks, including system administration, scripting and automation, and software development. I'm also capable of running and managing Windows, Linux,
+Prompt: Nice to meet you, PowerShell. What can you do?",
+            "response": "I can perform a variety of tasks, including system administration, scripting and automation, and software development. I'm also capable of running and managing Windows, Linux,
+Response:  and MacOS systems. Additionally, I can be used to create and manage databases, automate network processes, and create custom programs."
+        },
+        {
+            "input": "How can I get started learning PowerShell?",
+            "response
+Prompt:  and MacOS systems. Additionally, I can be used to create and manage databases, automate network processes, and create custom programs."
+        },
+        {
+            "input": "How can I get started learning PowerShell?",
+            "response
+Response: ": "The best way to get started learning PowerShell is to take an online course or attend a training class. Additionally, you can find many tutorials and guides online to help you get started with PowerShell. There are also many books available on the subject.
+Prompt: ": "The best way to get started learning PowerShell is to take an online course or attend a training class. Additionally, you can find many tutorials and guides online to help you get started with PowerShell. There are also many books available on the subject.
+Response:  Finally, Microsoft provides a PowerShell Getting Started Guide which provides a great overview of the language and how to use it.
+Prompt:  Finally, Microsoft provides a PowerShell Getting Started Guide which provides a great overview of the language and how to use it.
+Response: 
+
+In conclusion, Microsoft provides a number of resources to help users get started using PowerShell. These resources range from tutorials and documentation to blogs and forums. Additionally, there are a number of third-party resources available which can provide additional help and support
+Prompt: 
+
+In conclusion, Microsoft provides a number of resources to help users get started using PowerShell. These resources range from tutorials and documentation to blogs and forums. Additionally, there are a number of third-party resources available which can provide additional help and support
+Response: . With these resources, users can quickly learn the basics of PowerShell and become productive in managing Windows systems.
+Prompt: . With these resources, users can quickly learn the basics of PowerShell and become productive in managing Windows systems.
+Response: 
+
+PowerShell has a number of built-in cmdlets that are used to manage Windows systems. These cmdlets can be used to perform a variety of system management tasks, such as creating and managing user accounts, configuring network settings, and
+Prompt: 
+
+PowerShell has a number of built-in cmdlets that are used to manage Windows systems. These cmdlets can be used to perform a variety of system management tasks, such as creating and managing user accounts, configuring network settings, and
+Response:  managing services. The cmdlets allow administrators to automate administrative tasks and quickly configure a system. Examples of these cmdlets include Get-Service, Set-Service, Get-Process, Start-Process, Stop-Process, Get-EventLog, and
+Prompt:  managing services. The cmdlets allow administrators to automate administrative tasks and quickly configure a system. Examples of these cmdlets include Get-Service, Set-Service, Get-Process, Start-Process, Stop-Process, Get-EventLog, and
+Response:  Clear-EventLog.
+
+The Get-Service cmdlet retrieves a list of services currently running on the system, as well as their status, start type, and name. The Set-Service cmdlet allows administrators to change the start type

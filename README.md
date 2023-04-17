@@ -23,7 +23,7 @@ To update these options, select "y" when it prmpts "Do you want to check options
 
 ## Examples
 
-In the "examples" folder there are the examples for a run using each model.  GPT4ALL is almost useless, but a better plugin that formats for GPT4All might help.
+In the "examples" folder there are the examples for a run using each model.  GPT4ALL is almost useless, but a better plugin that formats for GPT4All might help, but I think it is the model, feel free to add your own implementations of other GPTs.
 
 ## Creating Plugins
 
