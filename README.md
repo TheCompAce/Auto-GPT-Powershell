@@ -32,9 +32,24 @@ AutoGPT_PS includes a plugin system that allows for easy customization of input 
 1. Start plugins
 2. Input plugins
 3. Output plugins
+4. System plugins
 
-Each plugin should be a PowerShell script with a specific naming convention: `N_Name_PluginType_Format.ps1`, where `N` is an integer, `Name` is a descriptive name for the plugin, and `PluginType` is one of the three types: `Start`, `Input`, or `Output`.
+Each plugin should be a PowerShell script with a specific naming convention: `N_Name_PluginType_Format.ps1`, where `N` is an integer, `Name` is a descriptive name for the plugin, and `PluginType` is one of the three types: `Start`, `Input`, `Output`, or `System`.
 
 To create a new plugin, simply create a new PowerShell script with the appropriate naming convention and place it in the "plugins" folder. The AutoGPT_PS script will automatically discover and run the plugins in the specified order.
 
-For examples of each plugin type, see the scripts provided in the "plugins" folder.
+Base setup of each plugin type, see the scripts provided in the "plugins" folder.
+
+The plugin system is based on separate modules for different types of plugins:
+
+1. RunStartPlugins.ps1: Searches for and runs start plugins in the "plugins" folder. Example:
+   - plugins/1_Sample_Start_Format.ps1: A sample start plugin that leaves the start message unchanged
+
+2. RunInputPlugins.ps1: Searches for and runs input plugins in the "plugins" folder. Example:
+   - plugins/1_Sample_Input_Format.ps1: A sample input plugin that leaves the prompt unchanged
+
+3. RunSystemPlugins.ps1: Searches for and runs system plugins in the "plugins" folder. Example:
+   - plugins/1_Sample_System_Format.ps1: A sample system plugin that leaves the system message unchanged
+
+4. RunOutputPlugins.ps1: Searches for and runs output plugins in the "plugins" folder. Example:
+   - plugins/1_SessionLog_Output_Format.ps1: A sample output plugin that logs the output to a session file
