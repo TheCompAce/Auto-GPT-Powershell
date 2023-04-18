@@ -9,14 +9,15 @@ function GetFullName {
 function Run {
     Param(
         [string]$prompt,
-        [string]$response
+        [string]$response,
+        [string]$system
     )
 
     Debug -debugText "Debug: $(GetFullName)"
     Add-Content -Path $SessionFile -Value "Prompt: $prompt`nResponse: $response"
 
     # This file takes in the "Prompt" and returns it without changing it.
-    return $prompt
+    return $response
 }
 
 function GetProperties {
@@ -48,19 +49,19 @@ function GetConfigurable {
 }
 
 function GetPluginType {
-    return "3" # Output Plugin
+    return 3 # Output Plugin
 }
 
 # ////////////////////////////////////////////////////////////
 # Common Code do not change unles you want to break something.
 # ////////////////////////////////////////////////////////////
 
-
 switch ($FunctionName) {
     "GetFullName" { return GetFullName }
     "GetConfigurable" { return GetConfigurable }
-    "Run" { return Run -prompt $ArgumentList[0] -response $ArgumentList[1] }
+    "Run" { return Run -prompt $ArgumentList[0] -response $ArgumentList[1] -system $ArgumentList[2]}
     "GetPluginType" { return GetPluginType }
     "GetProperties" { return GetProperties }
     default { Write-Host "Invalid function name" }
 }
+

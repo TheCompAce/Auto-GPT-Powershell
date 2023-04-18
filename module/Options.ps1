@@ -13,9 +13,8 @@ function ShowOptions {
     Write-Host "6. Set OpenAI Key ($($Settings.OpenAIKey))"
     Write-Host "7. OpenAI Models ($($Settings.OpenAiModel))"
     Write-Host "8. Turn On Debug ($($Settings.Debug))"
-    Write-Host "9. Allow GPT in plugins ($($Settings.AllowPluginGPTs))"
-    Write-Host "10. Plugin Settings"
-    Write-Host "11. Exit"
+    Write-Host "9. Plugin Settings"
+    Write-Host "10. Exit"
 }
 
 function ShowLocalModels {
@@ -33,7 +32,76 @@ function ShowOpenAIModels {
     }
 }
 
+function ConfigurePluginMenu {
+    Param(
+        [string]$pluginName,
+        [array]$properties
+    )
 
+    while ($true) {
+        Write-Host "Plugin Configuration:" -ForegroundColor Green
+
+        # Build dynamic menu from properties
+        for ($i = 0; $i -lt $properties.Count; $i++) {
+            if ($properties[$i]["Type"] -eq "Array") {
+                $linkedProperty = $properties[$i]["Link"]
+                $selectedIndex = GetProperty -properties $properties -propertyName $linkedProperty
+                if ($selectedIndex -ne $null) {
+                    $displayValue = $properties[$i]["Value"][$selectedIndex]
+                } else {
+                    $displayValue = "Not set"
+                }
+            } elseif ($properties[$i]["Type"] -eq "Hidden") {
+                continue
+            } else {
+                $displayValue = $properties[$i]["Value"]
+            }
+            Write-Host ("{0}. {1} ({2})" -f ($i + 1), $properties[$i]["Name"], $displayValue)
+        }
+
+        Write-Host ("{0}. Save and Exit" -f ($properties.Count + 1))
+
+        $input = Read-Host "Choose an option (1-$($properties.Count + 1)):"
+        [int]::TryParse($input, [ref]$option)
+
+        if ($option -eq ($properties.Count + 1)) {
+            # Save and Exit
+            $SetName = & $pluginName -FunctionName "GetFullName"
+            SavePluginPropertiesToFile -pluginName $SetName -properties $properties
+            return $properties
+        } elseif ($option -gt 0 -and $option -le $properties.Count) {
+            # Update property value based on its type
+            Write-Host $properties[$option - 1]["Type"]
+            switch ($properties[$option - 1]["Type"]) {
+                "Boolean" { $properties[$option - 1]["Value"] = -not $properties[$option - 1]["Value"] }
+                "String" {
+                    $newValue = Read-Host "Enter a new value for $($properties[$option - 1]['Name'])"
+                    $properties[$option - 1]["Value"] = $newValue
+                }
+                "Int" {
+                    $newValue = Read-Host "Enter a new value for $($properties[$option - 1]['Name'])"
+                    $properties[$option - 1]["Value"] = $newValue
+                }
+                "Array" {
+                    $arrayValues = $properties[$option - 1]["Value"]
+                    Write-Host "Available options:"
+                    for ($i = 0; $i -lt $arrayValues.Count; $i++) {
+                        Write-Host ("{0}. {1}" -f ($i + 1), $arrayValues[$i])
+                    }
+                    $selected = Read-Host "Choose an option (1-$($arrayValues.Count)):"
+                    if ($selected -gt 0 -and $selected -le $arrayValues.Count) {
+                        $linkedProperty = $properties[$option - 1]["Link"]
+                        $properties | Where-Object { $_["Name"] -eq $linkedProperty } | ForEach-Object { $_["Value"] = $selected - 1 }
+                    } else {
+                        Write-Host "Invalid option"
+                    }
+                }
+            }
+        } else {
+            Write-Host "Invalid option"
+        }
+    }
+}
 
 function ShowPluginSettings {
     Write-Host "Plugin Settings:" -ForegroundColor Green
@@ -78,21 +146,7 @@ function ShowPluginSettings {
 
 function ConfigurePlugin {
     Param(
-        [string]$pluginName,
-        [array]$properties
-    )
-
-    $menuItems = @(
-        @{
-            Name = "Enabled"
-            Type = "boolean"
-            Prompt = "Enable/disable the plugin"
-        },
-        @{
-            Name = "Order"
-            Type = "int"
-            Prompt = "Set the order of the plugin (lower numbers execute first)"
-        }
+        [string]$pluginName
     )
 
     $pluginProps = & $pluginName -FunctionName "GetProperties"
@@ -101,7 +155,7 @@ function ConfigurePlugin {
 
 while ($true) {
     ShowOptions
-    $option = Read-Host "Choose an option (1-11):"
+    $option = Read-Host "Choose an option (1-10):"
 
     switch ($option) {
         1 {
@@ -119,8 +173,7 @@ while ($true) {
             $Settings.OpenAiModel = $oaModels[$modelIndex - 1]
         }
         8 { $Settings.Debug = -not $Settings.Debug }
-        9 { $Settings.AllowPluginGPTs = -not $Settings.AllowPluginGPTs }
-        10 {
+        9 {
             $pluginFiles = ShowPluginSettings
             $pluginIndex = Read-Host "Enter the number of the plugin you want to configure (1-$($pluginFiles.Count))"
             if ($pluginIndex -and $pluginIndex -ge 1 -and $pluginIndex -le $pluginFiles.Count) {
@@ -129,7 +182,7 @@ while ($true) {
                 Write-Host "Invalid plugin selection"
             }
         }
-        11 { return }
+        10 { return }
         default { Write-Host "Invalid option" }
     }
 

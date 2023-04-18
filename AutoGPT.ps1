@@ -12,7 +12,6 @@ Param(
     [string]$SystemPrompt,
     [string]$StartPromptFilePath,
     [string]$SystemPromptFilePath,
-    [bool]$AllowPluginGPTs,
     [string]$SessionFolder,
     [string]$SessionFile
 )
@@ -87,7 +86,7 @@ if ($Settings.UseChatGPT -and ($Settings.OpenAiModel -eq "gpt-3.5-turbo" -or $Se
 # Create the "sessions" folder if it doesn't exist
 $defaultSessionFolder = "sessions"
 if (-not (Test-Path $defaultSessionFolder)) {
-    New-Item -ItemType Directory -Path $defaultSessionFolder
+    New-Item -ItemType Directory -Path $defaultSessionFolder | Out-Null
 }
 
 if ([string]::IsNullOrEmpty($SessionFolder)) {
@@ -96,7 +95,7 @@ if ([string]::IsNullOrEmpty($SessionFolder)) {
 }
 
 if (-not (Test-Path $sessionFolder)) {
-    New-Item -ItemType Directory -Path $sessionFolder
+    New-Item -ItemType Directory -Path $sessionFolder | Out-Null
 }
 
 if ([string]::IsNullOrEmpty($SessionFile)) {
@@ -110,7 +109,7 @@ Debug -debugText "Starting AutoGPT System"
 
 # Run start plugins
 # . .\module\RunStartPlugins.ps1
-RunPluginsByType -pluginType "0"
+$prompt = RunPluginsByType -pluginType 0 -prompt $prompt
 
 $runCt = 0
 # Main loop
@@ -122,7 +121,7 @@ do {
     
         # Run input plugins
         # . .\module\RunSystemPlugins.ps1
-        RunPluginsByType -pluginType "1"
+        $startSystem = RunPluginsByType -pluginType 1 -prompt $prompt -response $response -system $startSystem
     
         Debug -debugText "System: $($startSystem)"
     }
@@ -131,24 +130,27 @@ do {
 
     # Run input plugins
     # . .\module\RunInputPlugins.ps1
-    RunPluginsByType -pluginType "2"
+    $prompt = RunPluginsByType -pluginType 2 -prompt $prompt -response $response -system $startSystem
 
     Debug -debugText "Prompt: $($prompt)"
+    . .\module\RunChatGPTAPI.ps1
+    . .\module\RunGPT4Exe.ps1
 
     # Run GPT-4 executable or ChatGPT API
     if ($Settings.UseChatGPT) {
-        . .\module\RunChatGPTAPI.ps1
-        $response = Invoke-ChatGPTAPI -apiKey $Settings.OpenAIKey -prompt $prompt -startSystem $startSystem
+        
+        $response = Invoke-ChatGPTAPI -apiKey $Settings.OpenAIKey -prompt $prompt -startSystem $startSystem -model $Settings.OpenAiModel
 
     } else {
-        . .\module\RunGPT4Exe.ps1
+        
+        $response = Invoke-GPT4ALL -prompt $prompt -model $Settings.model
     }
 
     Debug -debugText "Response: $($response)"
 
     # Run output plugins
     # . .\module\RunOutputPlugins.ps1
-    RunPluginsByType -pluginType "3"
+    $response = RunPluginsByType -pluginType 3 -prompt $prompt -response $response -system $startSystem
 
     $prompt = $response
 

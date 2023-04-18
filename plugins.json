@@ -59,6 +59,96 @@
         }
       ],
       "FullName": "System Sample Plugin"
+    },
+    {
+      "Properties": [
+        {
+          "Value": true,
+          "Name": "Enabled",
+          "Type": "Boolean"
+        },
+        {
+          "Value": "50",
+          "Name": "Order",
+          "Type": "Int"
+        },
+        {
+          "Value": false,
+          "Name": "Remove Code From Response.",
+          "Type": "Boolean"
+        },
+        {
+          "Value": false,
+          "Name": "Override GPT",
+          "Type": "Boolean"
+        },
+        {
+          "Value": false,
+          "Name": "Use Offline GPT",
+          "Type": "Boolean"
+        },
+        {
+          "Value": "gpt4all-lora-quantized.bin",
+          "Name": "Offline Model",
+          "Type": "String"
+        },
+        {
+          "Value": [
+            "text-davinci-003",
+            "gpt-3.5-turbo",
+            "gpt-4"
+          ],
+          "Name": "ChatGPT Model",
+          "Link": "SelectedChatGPTModelIndex",
+          "Type": "Array"
+        },
+        {
+          "Value": 2,
+          "Name": "SelectedChatGPTModelIndex",
+          "Type": "Hidden"
+        },
+        {
+          "Value": true,
+          "Name": "Use GPT to Get Filenames",
+          "Type": "Boolean"
+        },
+        {
+          "Value": "Return ONLY the JSON [code]{ 'filename': [filename] }[/code] Where [filename] is the file name for the code. (If you can not find the filename then make one up based on the code and type.)",
+          "Name": "Filename System Prompt",
+          "Type": "String"
+        },
+        {
+          "Value": false,
+          "Name": "Use GPT to edit base files.",
+          "Type": "Boolean"
+        },
+        {
+          "Value": "test",
+          "Name": "Edit Source System Prompt",
+          "Type": "String"
+        }
+      ],
+      "FullName": "Output Code Saver Plugin"
+    },
+    {
+      "Properties": [
+        {
+          "Value": true,
+          "Name": "Enabled",
+          "Type": "Boolean"
+        },
+        {
+          "Value": "50",
+          "Name": "Order",
+          "Type": "Int"
+        },
+        {
+          "Value": "Add the filename (and path) as a comment to the top of all code blocks.",
+          "Name": "Add To System Prompt",
+          "Type": "String"
+        }
+      ],
+      "FullName": "System Code Saver Plugin"
     }
   ]
 }

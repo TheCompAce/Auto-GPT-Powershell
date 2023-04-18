@@ -44,7 +44,7 @@ The plugin system is based on separate modules for different types of plugins:
    - plugins/System_Sample.ps1: A sample system plugin that leaves the system message unchanged
 
 4. RunOutputPlugins.ps1: Searches for and runs output plugins in the "plugins" folder. Example:
-   - plugins/Output_CodeSaver.ps16: Strips code out into "source_[time].txt" unless "Allow GPT in plugins" is enabled, then it will try to use ChatGPT to get the filename. (This will save multiple files, as some seem to get overy written with bad data.)
+   - plugins/Output_CodeSaver.ps1: Strips code out into "source_[time].txt" unless "Allow GPT in plugins" is enabled, then it will try to use ChatGPT to get the filename. (This will save multiple files, as some seem to get overy written with bad data.)
    - plugins/Output_SessionLog.ps1: A sample output plugin that logs the output to a session file
 
 ## Creating Plugins 🛠️

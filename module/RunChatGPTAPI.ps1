@@ -3,18 +3,17 @@
 function Invoke-ChatGPTAPI {
     param(
         [string]$apiKey,
+        [string]$model,
         [string]$prompt,
         [string]$startSystem
     )
-    
-    
     
     $headers = @{
         "Content-Type"  = "application/json"
         "Authorization" = "Bearer $($apiKey)"
     }
 
-    if ($Settings.OpenAiModel -eq "text-davinci-003") {
+    if ($model -eq "text-davinci-003") {
         $uri = "https://api.openai.com/v1/completions"
         $body = @{
             "model" = "text-davinci-003"
@@ -38,13 +37,13 @@ function Invoke-ChatGPTAPI {
         )
 
         $body = @{
-            "model" = $Settings.OpenAiModel
+            "model" = $model
             "messages" = $messages
         } | ConvertTo-Json -Depth 10
     }
     try {
         $oaResponse = Invoke-RestMethod -Method "POST" -Uri $uri -Headers $headers -Body $body
-        if ($Settings.OpenAiModel -eq "text-davinci-003") {
+        if ($model -eq "text-davinci-003") {
             return $oaResponse.choices[0].text
         } else {
             return $oaResponse.choices[0].message.content;

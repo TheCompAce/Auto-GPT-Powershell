@@ -8,7 +8,9 @@ function GetFullName {
 
 function Run {
     Param(
-        [string]$prompt
+        [string]$prompt,
+        [string]$response,
+        [string]$system
     )
 
     Debug -debugText "Debug: $(GetFullName)"
@@ -44,7 +46,7 @@ function GetConfigurable {
 }
 
 function GetPluginType {
-    return "0" # Start Plugin
+    return 0 # Start Plugin
 }
 
 # ////////////////////////////////////////////////////////////
@@ -55,7 +57,7 @@ function GetPluginType {
 switch ($FunctionName) {
     "GetFullName" { return GetFullName }
     "GetConfigurable" { return GetConfigurable }
-    "Run" { return Run -prompt $ArgumentList[0] }
+    "Run" { return Run -prompt $ArgumentList[0] -response $ArgumentList[1] -system $ArgumentList[2]}
     "GetPluginType" { return GetPluginType }
     "GetProperties" { return GetProperties }
     default { Write-Host "Invalid function name" }

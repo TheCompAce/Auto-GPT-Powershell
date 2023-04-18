@@ -3,7 +3,7 @@ Param(
     [array]$ArgumentList
 )
 function GetFullName {
-    return "System Sample Plugin"
+    return "System Code Saver Plugin"
 }
 
 function Run {
@@ -14,7 +14,11 @@ function Run {
     )
 
     Debug -debugText "Debug: $(GetFullName)"
-    # This file takes in the "Prompt" and returns it without changing it.
+
+    $props = GetProperties
+    $propVal = GetProperty -properties $props -propertyName "Add To System Prompt"
+    $system += " $($propVal)"
+
     return $system
 }
 
@@ -36,6 +40,11 @@ function GetProperties {
             Name  = "Order"
             Value = 99
             Type  = "Int"
+        },
+        @{
+            Name  = "Add To System Prompt"
+            Value = "Add the filename (and path) as a comment to the top of all code blocks."
+            Type  = "String"
         }
     )
     return $properties
@@ -52,6 +61,7 @@ function GetPluginType {
 # ////////////////////////////////////////////////////////////
 # Common Code do not change unles you want to break something.
 # ////////////////////////////////////////////////////////////
+
 
 switch ($FunctionName) {
     "GetFullName" { return GetFullName }
