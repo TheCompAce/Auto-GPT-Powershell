@@ -1,0 +1,54 @@
+{
+  "Plugins": [
+    {
+      "Properties": [
+        {
+          "Value": true,
+          "Name": "Enabled",
+          "Type": "Boolean"
+        }
+      ],
+      "FullName": "T:\\Tensorflow\\Programs\\depplearn\\tools\\dalai\\gpt4all-api-main\\ai\\AutoGPT_ps\\plugins\\Inout_Sample.ps1"
+    },
+    {
+      "Properties": [
+        {
+          "Value": true,
+          "Name": "Enabled",
+          "Type": "Boolean"
+        }
+      ],
+      "FullName": "Input Sample Plugin"
+    },
+    {
+      "Properties": [
+        {
+          "Value": true,
+          "Name": "Enabled",
+          "Type": "Boolean"
+        }
+      ],
+      "FullName": "System Sample Plugin"
+    },
+    {
+      "Properties": [
+        {
+          "Value": true,
+          "Name": "Enabled",
+          "Type": "Boolean"
+        }
+      ],
+      "FullName": "Output Session Log Plugin"
+    },
+    {
+      "Properties": [
+        {
+          "Value": true,
+          "Name": "Enabled",
+          "Type": "Boolean"
+        }
+      ],
+      "FullName": "Start Sample Plugin"
+    }
+  ]
+}

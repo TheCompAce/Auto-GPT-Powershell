@@ -17,16 +17,7 @@ Param(
     [string]$SessionFile
 )
 
-# Create the "sessions" folder if it doesn't exist
-if (-not (Test-Path "sessions")) {
-    New-Item -ItemType Directory -Path "sessions" | Out-Null
-}
-
-if ([string]::IsNullOrEmpty($SessionFolder)) {
-    $SessionFolder = "sessions/"
-}
-
-
+. .\module\General.ps1
 
 # Check if settings.json exists, create it with default settings if it doesn't
 if (-not (Test-Path "settings.json")) {
@@ -60,14 +51,14 @@ if ($Debug) { $settings.Debug = $Debug }
 if (-not ($model -or $pause -or $seed -or $UseChatGPT -or $OpenAIKey -or $OpenAiModel -or $LoopCount -or $Debug)) {
     $checkOptions = Read-Host "Do you want to check options? (y)es/(n)o"
     if ($checkOptions.ToLower() -eq 'y') {
-        . .\modules\Options.ps1 -Settings $Settings
+        . .\module\Options.ps1 -Settings $Settings
         # Reload settings
         $Settings = Get-Content -Path "settings.json" | ConvertFrom-Json
     }
 }
 
-. .\modules\General.ps1
 
+# . .\modules\VectorDB_PS\VectorDB.ps1
 # Remove existing log files
 Remove-Item -Path "session.txt" -ErrorAction Ignore
 Remove-Item -Path "system.log" -ErrorAction Ignore
@@ -81,9 +72,7 @@ if (-not $StartingPrompt -and (-not $StartPromptFilePath) -and (($Settings.UseCh
     $prompt = $StartingPrompt
 }
 
-if ($Settings.Debug) {
-    Write-Host "Start Prompt: $($prompt)"
-} 
+Debug -debugText "Start Prompt: $($prompt)"
 
 if ($Settings.UseChatGPT -and ($Settings.OpenAiModel -eq "gpt-3.5-turbo" -or $Settings.OpenAiModel -eq "gpt-4")) {
     if (-not $SystemPrompt -and (-not $SystemPromptFilePath)) {
@@ -95,17 +84,32 @@ if ($Settings.UseChatGPT -and ($Settings.OpenAiModel -eq "gpt-3.5-turbo" -or $Se
     }
 }
 
-if ([string]::IsNullOrEmpty($SessionFile)) {
-    $timestamp = Get-Date -Format "yyyyMMdd-HHmmss"
-    $SessionFile = "$($SessionFolder)session_$($timestamp).txt"
+# Create the "sessions" folder if it doesn't exist
+$defaultSessionFolder = "sessions"
+if (-not (Test-Path $defaultSessionFolder)) {
+    New-Item -ItemType Directory -Path $defaultSessionFolder
 }
 
-if ($Settings.Debug) {
-    Write-Host "Start System: $($startSystem)"
-} 
+if ([string]::IsNullOrEmpty($SessionFolder)) {
+    $timestamp = Get-Date -Format "yyyyMMdd-HHmmss"
+    $sessionFolder = Join-Path $defaultSessionFolder "session_$timestamp"
+}
+
+if (-not (Test-Path $sessionFolder)) {
+    New-Item -ItemType Directory -Path $sessionFolder
+}
+
+if ([string]::IsNullOrEmpty($SessionFile)) {
+    $timestamp = Get-Date -Format "yyyyMMdd-HHmmss"
+    $SessionFile = Join-Path $SessionFolder "session_$($timestamp).txt"
+}
+
+Debug -debugText "Starting AutoGPT System"
+
+
 
 # Run start plugins
-. .\modules\RunStartPlugins.ps1
+. .\module\RunStartPlugins.ps1
 
 
 $runCt = 0
@@ -113,50 +117,39 @@ $runCt = 0
 do {
 
     if ($Settings.UseChatGPT -and $Settings.OpenAiModel -ne "text-davinci-003") {
-        if ($Settings.Debug) {
-            Write-Host "System : $($startSystem)"
-        } 
+
+        Debug -debugText "System : $($startSystem)"
     
         # Run input plugins
-        . .\modules\RunSystemPlugins.ps1
+        . .\module\RunSystemPlugins.ps1
     
-        if ($Settings.Debug) {
-            Write-Host "System: $($startSystem)"
-        } 
+        Debug -debugText "System: $($startSystem)"
     }
 
-    if ($Settings.Debug) {
-        Write-Host "Prompt: $($prompt)"
-    } 
+    Debug -debugText "Prompt: $($prompt)"
 
     # Run input plugins
-    . .\modules\RunInputPlugins.ps1
+    . .\module\RunInputPlugins.ps1
 
-    if ($Settings.Debug) {
-        Write-Host "Prompt: $($prompt)"
-    } 
+    Debug -debugText "Prompt: $($prompt)"
 
     # Run GPT-4 executable or ChatGPT API
     if ($Settings.UseChatGPT) {
-        . .\modules\RunChatGPTAPI.ps1
+        . .\module\RunChatGPTAPI.ps1
         $response = Invoke-ChatGPTAPI -apiKey $Settings.OpenAIKey -prompt $prompt -startSystem $startSystem
 
     } else {
-        . .\modules\RunGPT4Exe.ps1
+        . .\module\RunGPT4Exe.ps1
     }
 
-    if ($Settings.Debug) {
-        Write-Host "Response: $($response)"
-    } 
+    Debug -debugText "Response: $($response)"
 
     # Run output plugins
-    . .\modules\RunOutputPlugins.ps1
+    . .\module\RunOutputPlugins.ps1
 
     $prompt = $response
 
-    if ($Settings.Debug) {
-        Write-Host "Response: $($response)"
-    } 
+    Debug -debugText "Response: $($response)"
 
     # Pause if selected
     if ($settings.pause.ToLower() -eq "y") {
