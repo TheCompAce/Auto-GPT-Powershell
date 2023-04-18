@@ -12,12 +12,9 @@ function Run {
         [string]$response
     )
 
-    $properties = GetProperties
+    Debug -debugText "Debug: $(GetFullName)"
+    Add-Content -Path $SessionFile -Value "Prompt: $prompt`nResponse: $response"
 
-    if ($properties.Enabled) {
-        Debug -debugText "Debug: $(GetFullName)"
-        Add-Content -Path $SessionFile -Value "Prompt: $prompt`nResponse: $response"
-    }
     # This file takes in the "Prompt" and returns it without changing it.
     return $prompt
 }
@@ -35,6 +32,11 @@ function GetProperties {
             Name  = "Enabled"
             Value = $false
             Type  = "Boolean"
+        },
+        @{
+            Name  = "Order"
+            Value = 99
+            Type  = "Int"
         }
     )
 

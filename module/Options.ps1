@@ -39,28 +39,60 @@ function ShowPluginSettings {
     Write-Host "Plugin Settings:" -ForegroundColor Green
     $foundPlugins = @()
     $pluginFiles = Get-ChildItem -Path ".\plugins" -Filter "*.ps1" | Sort-Object Name
-    for ($i = 0; $i -lt $pluginFiles.Count; $i++) {
+    $pluginsByType = @{}
+
+    foreach ($pluginFile in $pluginFiles) {
         # Call the GetConfigurable function from the plugin file
-        $pluginConfigurable = & $pluginFiles[$i].FullName -FunctionName "GetConfigurable"
+        $pluginConfigurable = & $pluginFile.FullName -FunctionName "GetConfigurable"
 
         if ($pluginConfigurable -eq "True") {
-            $foundPlugins += $pluginFiles[$i]
             # Call the GetFullName function from the plugin file
-            $pluginName = & $pluginFiles[$i].FullName -FunctionName "GetFullName"
-            $pluginType = & $pluginFiles[$i].FullName -FunctionName "GetPluginType"
-            $pluginStr = GetPluginNameFromType -PluginType $pluginType
-            $pluginProps = & $pluginFiles[$i].FullName -FunctionName "GetProperties"
+            $pluginType = & $pluginFile.FullName -FunctionName "GetPluginType"
+
+            if (-not $pluginsByType.ContainsKey($pluginType)) {
+                $pluginsByType[$pluginType] = @()
+            }
+
+            $pluginsByType[$pluginType] += $pluginFile
+        }
+    }
+
+    foreach ($pluginType in $pluginsByType.Keys) {
+        $pluginName = GetPluginNameFromType -PluginType $pluginType
+        Write-Host ("{0} Plugins:" -f $pluginName) -ForegroundColor Yellow
+        $plugins = $pluginsByType[$pluginType] | Sort-Object { (GetProperty -properties (& $_.FullName -FunctionName "GetProperties") -propertyName "Order") }
+
+        for ($i = 0; $i -lt $plugins.Count; $i++) {
+            $foundPlugins += $plugins[$i]
+            $pluginName = & $plugins[$i].FullName -FunctionName "GetFullName"
+            $pluginProps = & $plugins[$i].FullName -FunctionName "GetProperties"
             $pluginEnabled = GetProperty -properties $pluginProps -propertyName "Enabled"
-            Write-Host ("{0}. {1} ({2} - {3})" -f ($foundPlugins.Count), $pluginName, $pluginStr, $pluginEnabled)
+            $pluginOrder = GetProperty -properties $pluginProps -propertyName "Order"
+            Write-Host ("{0}. {1} ({2}) [Order: {3}]" -f ($foundPlugins.Count), $pluginName, $pluginEnabled, $pluginOrder)
         }
     }
 
     return $foundPlugins
 }
 
+
 function ConfigurePlugin {
     Param(
-        [string]$pluginName
+        [string]$pluginName,
+        [array]$properties
+    )
+
+    $menuItems = @(
+        @{
+            Name = "Enabled"
+            Type = "boolean"
+            Prompt = "Enable/disable the plugin"
+        },
+        @{
+            Name = "Order"
+            Type = "int"
+            Prompt = "Set the order of the plugin (lower numbers execute first)"
+        }
     )
 
     $pluginProps = & $pluginName -FunctionName "GetProperties"

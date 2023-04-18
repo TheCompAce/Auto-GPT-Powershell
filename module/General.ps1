@@ -48,6 +48,25 @@ function GetProperty {
     return $null
 }
 
+function RunPluginsByType {
+    Param(
+        [string]$pluginType
+    )
+
+    $plugins = GetPluginsOfType -PluginType $pluginType | Sort-Object { (GetProperty -properties (& $_.FullName -FunctionName "GetProperties") -propertyName "Order") }
+
+    
+
+    for ($i = 0; $i -lt $plugins.Count; $i++) {
+        $properties = & $plugins[$i].FullName -FunctionName "GetProperties"
+        $enabled = GetProperty -properties $properties -propertyName "Enabled"
+        
+        if ($enabled) {
+            $prompt = & $plugins[$i].FullName -FunctionName "Run" -ArgumentList $prompt,$response
+        }
+    }
+}
+
 function GetPluginPropertiesFromFile {
     Param(
         [string]$pluginName
@@ -145,6 +164,10 @@ function ConfigurePluginMenu {
             switch ($properties[$option - 1]["Type"]) {
                 "Boolean" { $properties[$option - 1]["Value"] = -not $properties[$option - 1]["Value"] }
                 "String" {
+                    $newValue = Read-Host "Enter a new value for $($properties[$option - 1]['Name'])"
+                    $properties[$option - 1]["Value"] = $newValue
+                }
+                "Int" {
                     $newValue = Read-Host "Enter a new value for $($properties[$option - 1]['Name'])"
                     $properties[$option - 1]["Value"] = $newValue
                 }

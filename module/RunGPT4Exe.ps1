@@ -28,7 +28,7 @@ Add-Content -Path "system.log" -Value $Output
 Remove-Item -Path $tempOutputFile.FullName
 
 # Continue with the rest of the script
-. .\modules\ParseOutput.ps1
+. .\module\ParseOutput.ps1
 
 # Clean up the temporary file
 Remove-Item -Path $tempPromptFile.FullName

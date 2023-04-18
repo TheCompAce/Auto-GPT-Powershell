@@ -11,11 +11,7 @@ function Run {
         [string]$prompt
     )
 
-    $properties = GetProperties
-
-    if ($properties.Enabled) {
-        Debug -debugText "Debug: $(GetFullName)"
-    }
+    Debug -debugText "Debug: $(GetFullName)"
     # This file takes in the "Prompt" and returns it without changing it.
     return $prompt
 }
@@ -33,6 +29,11 @@ function GetProperties {
             Name  = "Enabled"
             Value = $false
             Type  = "Boolean"
+        },
+        @{
+            Name  = "Order"
+            Value = 99
+            Type  = "Int"
         }
     )
     return $properties

@@ -64,7 +64,7 @@ Remove-Item -Path "session.txt" -ErrorAction Ignore
 Remove-Item -Path "system.log" -ErrorAction Ignore
 
 # Set initial prompt
-if (-not $StartingPrompt -and (-not $StartPromptFilePath) -and (($Settings.UseChatGPT -and ($Settings.OpenAiModel -eq "gpt-3.5-turbo" -or $Settings.OpenAiModel -eq "gpt-4")))) {
+if (-not $StartingPrompt -and (-not $StartPromptFilePath)) {
     $prompt = Read-Host "Enter the starting prompt"
 } elseif ($StartPromptFilePath) {
     $prompt = Get-Content -Path $StartPromptFilePath -Raw
@@ -109,8 +109,8 @@ Debug -debugText "Starting AutoGPT System"
 
 
 # Run start plugins
-. .\module\RunStartPlugins.ps1
-
+# . .\module\RunStartPlugins.ps1
+RunPluginsByType -pluginType "0"
 
 $runCt = 0
 # Main loop
@@ -121,7 +121,8 @@ do {
         Debug -debugText "System : $($startSystem)"
     
         # Run input plugins
-        . .\module\RunSystemPlugins.ps1
+        # . .\module\RunSystemPlugins.ps1
+        RunPluginsByType -pluginType "1"
     
         Debug -debugText "System: $($startSystem)"
     }
@@ -129,7 +130,8 @@ do {
     Debug -debugText "Prompt: $($prompt)"
 
     # Run input plugins
-    . .\module\RunInputPlugins.ps1
+    # . .\module\RunInputPlugins.ps1
+    RunPluginsByType -pluginType "2"
 
     Debug -debugText "Prompt: $($prompt)"
 
@@ -145,7 +147,8 @@ do {
     Debug -debugText "Response: $($response)"
 
     # Run output plugins
-    . .\module\RunOutputPlugins.ps1
+    # . .\module\RunOutputPlugins.ps1
+    RunPluginsByType -pluginType "3"
 
     $prompt = $response
 
