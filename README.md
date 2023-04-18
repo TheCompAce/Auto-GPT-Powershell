@@ -26,6 +26,7 @@ Download the `gpt4all-lora-quantized.bin` file from [Direct Link](https://the-ey
 7. **OpenAI Models**: Allows selection of an OpenAI model from the available options: `text-davinci-003`, `gpt-3.5-turbo`, and `gpt-4`. Default value: `text-davinci-003`.
 8. **Allow GPT in plugins**: Allows plugins to use the settings for OpenAI. Default value: `False`
 9. **Turn On Debug**: Enables or disables debug messages at most steps of the scripts. Default value: `False` (disabled).
+10. **Plugin Settings**: Allows you to Enable and change settings of Plugins.
 
 To update these options, select "y" when it prompts "Do you want to check options? (y)es/(n)o:" at the start.
 
