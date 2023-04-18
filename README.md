@@ -10,7 +10,7 @@ AutoGPT_PS is a PowerShell script that runs GPT-4, processes user input, and ret
 4. Select `y` to go to the Options.
 5. Enter the Starting Prompt (If using OpenAI GPT 3.5 or higher, then you will also be asked for a System Prompt.)
 6. The Main Loop will run; if you have set the Loop Count to Infinite, press Ctrl-C to cancel.
-7. Once completed, there will be a time-stamped "session_[time].txt" file in the "sessions" folder, containing the prompts and responses passed back and forth.
+7. Once completed, there will be a time-stamped "session_[time]" folder in the "sessions" folder, containing "session_[time].txt" file with the prompts and responses passed back and forth. If "Output Session Log Plugin" is enabled.
 
 ### How to get the GPT4ALL model! 💾
 Download the `gpt4all-lora-quantized.bin` file from [Direct Link](https://the-eye.eu/public/AI/models/nomic-ai/gpt4all/gpt4all-lora-quantized.bin) or [[Torrent-Magnet]](https://tinyurl.com/gpt4all-lora-quantized).
