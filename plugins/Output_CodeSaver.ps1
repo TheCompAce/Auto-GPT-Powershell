@@ -42,8 +42,8 @@ function Run {
         $code = $match.Value.Trim()
         if ($code) {
             $lineCount = ($code -split "`n").Count 
-            Write-Host $lineCount - -ForegroundColor Yellow
-            if ($lineCount -gt 1) {
+            if ($lineCount -gt 2) {
+                Write-Host $lineCount -ForegroundColor Red
                 $isCode = Is-LikelyCode -code $code -thresholdPct 4.0
                 $isLang = Is-LikelyNaturalLanguage -text $code -thresholdPct 2.0
                 # if ($isLang -ne 0) {
@@ -57,9 +57,10 @@ function Run {
 
                     Debug -debugText "Debug: Code Found $($code)"
             
+                    $iscode = $true;
                     if ($useGPTFilename) {
                         $usePrompt = "$($code)"
-
+                        
                         if ($useOffline) {
                             $filenameJson = Invoke-GPT4ALL -prompt $usePrompt -model $offlineModel
 
@@ -79,6 +80,7 @@ function Run {
                                 try {
                                     $jsonObject = $filenameJson | ConvertFrom-Json
                                     $filename = $jsonObject.filename
+                                    $iscode = $jsonObject.iscode
                                 } catch {
                                     Write-Host "Error: Failed to parse JSON for filename."
                                     $filename = $null
@@ -91,6 +93,7 @@ function Run {
                                 try {
                                     $jsonObject = $filenameJson | ConvertFrom-Json
                                     $filename = $jsonObject.filename
+                                    $iscode = $jsonObject.iscode
                                 } catch {
                                     Write-Host "Error: Failed to parse JSON for filename."
                                     $filename = $null
@@ -109,12 +112,14 @@ function Run {
                         $timestamp = Get-Date -Format "yyyyMMdd-HHmmss"
                         $filename = "source_$($timestamp).txt"
                     }
-            
-                    $uniqueFilename = Get-UniqueFilename -filename $filename -folder $SessionFolder
-                    Write-Host $uniqueFilename -ForegroundColor DarkMagenta
 
-                    Debug -debugText "Debug: Filename = $($filename)"
-                    SaveCodeToFile -filename $uniqueFilename -content $code
+                    if ($iscode) {
+                        $uniqueFilename = Get-UniqueFilename -filename $filename -folder $SessionFolder
+                        Write-Host $uniqueFilename -ForegroundColor DarkMagenta
+
+                        Debug -debugText "Debug: Filename = $($filename)"
+                        SaveCodeToFile -filename $uniqueFilename -content $code
+                    }
                 # }
             }
         }
@@ -182,7 +187,7 @@ function GetProperties {
         },
         @{
             Name  = "Filename System Prompt"
-            Value = "Respond with ONLY a JSON [code]{ 'filename': [filename] }[/code]. The prompt should have a filename commented out at the type of the code to set to the [filename] value in the response JSON. (If not then create a filename (with extension) from the code itself.)"
+            Value = "Respond with ONLY a JSON [code]{ 'filename': [filename], 'iscode': [iscode] }[/code]. The prompt should have a filename commented out at the type of the code to set to the [filename] value in the response JSON. (If not then create a filename (with extension) from the code itself.) And for the [iscode] set the value to a boolean value of true if the prompt is source code, or false if it is just text."
             Type  = "String"
         },
         @{

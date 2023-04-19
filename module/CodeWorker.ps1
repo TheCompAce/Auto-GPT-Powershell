@@ -106,7 +106,6 @@ function Is-LikelyNaturalLanguage {
             }
 
             $naturalLanguagePct = ($matchedTextLength / $totalTextLength) * 100
-            Debug -debugText "Debug: Is-LikelyNaturalLanguage percentage for line '$($line)': $($naturalLanguagePct)."
 
             if ($naturalLanguagePct -ge $thresholdPct) {
                 $nlpLinesCount++

@@ -100,7 +100,7 @@ function GetPluginPropertiesFromFile {
     $pluginsJsonPath = ".\plugins.json"
 
     if (Test-Path $pluginsJsonPath) {
-        $pluginsJson = Get-Content $pluginsJsonPath | ConvertFrom-Json -Depth 10
+        $pluginsJson = Get-Content $pluginsJsonPath | ConvertFrom-Json
 
         foreach ($plugin in $pluginsJson.Plugins) {
             if ($plugin.FullName -eq $pluginFullName) {
@@ -138,7 +138,7 @@ function SavePluginPropertiesToFile {
     $pluginsJsonPath = ".\plugins.json"
 
     $pluginsJson = if (Test-Path $pluginsJsonPath) {
-        Get-Content $pluginsJsonPath | ConvertFrom-Json -Depth 10
+        Get-Content $pluginsJsonPath | ConvertFrom-Json
     } else {
         @{
             Plugins = @()

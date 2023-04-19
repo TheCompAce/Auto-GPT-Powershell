@@ -17,7 +17,7 @@ function Run {
 
     $props = GetProperties
     $propVal = GetProperty -properties $props -propertyName "Add To System Prompt"
-    $system = "$($propVal) $($system)"
+    $system = "$($system). The following '[codeSaver]' section should handle the formating of responses with source code in it. [codeSaver]$($propVal)[/codeSaver]"
 
     return $system
 }
@@ -43,7 +43,7 @@ function GetProperties {
         },
         @{
             Name  = "Add To System Prompt"
-            Value = "The [main] should be responsible for the primary functionality of the prompt, while the [codeSaver] should handle saving and retrieving code snippets. For each code example provided, include a comment at the top of the code with the filename (and path if needed)."
+            Value = "Ensure that your explanation is clear, concise, and uses markdown/text safe formatting. Provide detailed instructions, including code examples if necessary. For every code example provided, include a comment at the top of the code with the filename (and path if needed) referencing the code. We will work on this project in Steps. At the Start of each Response include a line for what we are about to do in this step. At the end of each Response include a line for the next step to take."
             Type  = "String"
         }
     )
