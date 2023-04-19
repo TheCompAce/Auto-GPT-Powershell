@@ -15,6 +15,18 @@ AutoGPT_PS is a PowerShell script that runs GPT-4, processes user input, and ret
 ### How to get the GPT4ALL model! 💾
 Download the `gpt4all-lora-quantized.bin` file from [Direct Link](https://the-eye.eu/public/AI/models/nomic-ai/gpt4all/gpt4all-lora-quantized.bin) or [[Torrent-Magnet]](https://tinyurl.com/gpt4all-lora-quantized).
 
+## Workflow 🔄
+
+1. Start the script.
+2. Ask if you want to change the options (if yes, then change options then return here, if no continue on).
+3. Ask for your "Start Prompt" - what to first ask the GPT, then "Start System" (if using OpenAI ChatGPT).
+4. Call the plugins for the "Start" (this is only called once) to change the prompt.
+5. Create the "Main" loop.
+6. In the "Main Loop", run the "System" plugins against the "Start System", then run the plugins for "Input" on the prompt.
+7. Send the prompt and the System to the GPT.
+8. When a response is received, run the "Output" plugins on the response.
+9. Once the response has been processed, save the response to the prompt and loop back to "Main".
+
 ## Options ⚙️
 
 1. **Change Model**: Allows selection of a .bin file to use for GPT4All. Example: `gpt4all-lora-quantized.bin`.
