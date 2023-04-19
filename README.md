@@ -79,6 +79,10 @@ For the base setup of each plugin type, see the scripts provided in the "plugins
 - Streamline the process of adding new plugins and managing existing ones.
 - Keep the project up-to-date with the latest GPT-4 model improvements and enhancements.
 
+## Contribute 🤝
+
+We welcome contributions to the AutoGPT_PS project! There are many ways to get involved:
+
 ## Credits 🏆
 - "gpt4all-lora-quantized-win64.exe" is used from https://github.com/nomic-ai/gpt4all
 - ChatGPT 4.0 it has written about 60% of this code.
