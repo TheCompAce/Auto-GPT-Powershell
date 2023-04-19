@@ -17,7 +17,7 @@ function Run {
 
     $props = GetProperties
     $propVal = GetProperty -properties $props -propertyName "Add To System Prompt"
-    $system += " $($propVal)"
+    $system = "$($propVal) $($system)"
 
     return $system
 }
@@ -43,7 +43,7 @@ function GetProperties {
         },
         @{
             Name  = "Add To System Prompt"
-            Value = "Add the filename (and path) as a comment to the top of all code blocks."
+            Value = "The [main] should be responsible for the primary functionality of the prompt, while the [codeSaver] should handle saving and retrieving code snippets. For each code example provided, include a comment at the top of the code with the filename (and path if needed)."
             Type  = "String"
         }
     )

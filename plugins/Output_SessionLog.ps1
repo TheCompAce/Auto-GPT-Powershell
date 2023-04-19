@@ -14,7 +14,7 @@ function Run {
     )
 
     Debug -debugText "Debug: $(GetFullName)"
-    Add-Content -Path $SessionFile -Value "Prompt: $prompt`nResponse: $response"
+    Add-Content -Path $SessionFile -Value "System: $system`nPrompt: $prompt`nResponse: $response"
 
     # This file takes in the "Prompt" and returns it without changing it.
     return $response

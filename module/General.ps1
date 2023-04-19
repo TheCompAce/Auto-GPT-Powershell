@@ -68,9 +68,9 @@ function RunPluginsByType {
     if ($pluginType -eq 1) {
         $retValue = $system
     } elseif ($pluginType -eq 2) {
-        $retValue = $response
-    } else {
         $retValue = $prompt
+    } else {
+        $retValue = $response
     }
     
     for ($i = 0; $i -lt $plugins.Count; $i++) {
@@ -81,9 +81,9 @@ function RunPluginsByType {
             if ($pluginType -eq 1) {
                 $retValue = & $plugins[$i].FullName -FunctionName "Run" -ArgumentList @($prompt, $response, $retValue)
             } elseif ($pluginType -eq 2) {
-                $retValue = & $plugins[$i].FullName -FunctionName "Run" -ArgumentList @($prompt, $response, $retValue)
+                $retValue = & $plugins[$i].FullName -FunctionName "Run" -ArgumentList @($retValue, $response, $System)
             } else {
-                $retValue = & $plugins[$i].FullName -FunctionName "Run" -ArgumentList @($prompt, $response, $retValue)
+                $retValue = & $plugins[$i].FullName -FunctionName "Run" -ArgumentList @($prompt, $retValue, $system)
             }
         }
     }

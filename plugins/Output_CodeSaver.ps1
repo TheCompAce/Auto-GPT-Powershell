@@ -36,79 +36,87 @@ function Run {
 
 
     $codePattern = "(?s)(?<=```).*?(?=```)"
-
     $codeMatches = [regex]::Matches($response, $codePattern)
     
     foreach ($match in $codeMatches) {
         $code = $match.Value.Trim()
         if ($code) {
-            $isCode = Is-LikelyCode -code $code -thresholdPct 4.0
-            $isLang = Is-LikelyNaturalLanguage -text $code -thresholdPct 2.0
-            # if ($isCode -and $isLang) {
-                Write-Host $code
-                Write-Host $isCode -ForegroundColor Cyan
-                Write-Host $isLang -ForegroundColor Cyan
+            $lineCount = ($code -split "`n").Count 
+            Write-Host $lineCount - -ForegroundColor Yellow
+            if ($lineCount -gt 1) {
+                $isCode = Is-LikelyCode -code $code -thresholdPct 4.0
+                $isLang = Is-LikelyNaturalLanguage -text $code -thresholdPct 2.0
+                # if ($isLang -ne 0) {
+                    $lines = $code -split "`n"    # Split the string into an array of lines
+                    $lines = $lines[1..($lines.Count - 1)]    # Remove the first line from the array
+                    $code = $lines -join "`n"    # Join the remaining lines back into a string
+                    Write-Host $code
 
-                Debug -debugText "Debug: Code Found $($code)"
-        
-                if ($useGPTFilename) {
-                    $usePrompt = "[Response]$($response)[/Response][code]$($code)[/code]"
+                    Write-Host $isCode -ForegroundColor Cyan
+                    Write-Host $isLang -ForegroundColor Cyan
 
-                    if ($useOffline) {
-                        $filenameJson = Invoke-GPT4ALL -prompt $usePrompt -model $offlineModel
+                    Debug -debugText "Debug: Code Found $($code)"
+            
+                    if ($useGPTFilename) {
+                        $usePrompt = "$($code)"
 
-                        try {
-                            $jsonObject = $filenameJson | ConvertFrom-Json
-                            $filename = $jsonObject.filename
-                        } catch {
-                            Write-Host "Error: Failed to parse JSON for filename."
-                            $filename = $null
+                        if ($useOffline) {
+                            $filenameJson = Invoke-GPT4ALL -prompt $usePrompt -model $offlineModel
+
+                            try {
+                                $jsonObject = $filenameJson | ConvertFrom-Json
+                                $filename = $jsonObject.filename
+                            } catch {
+                                Write-Host "Error: Failed to parse JSON for filename."
+                                $filename = $null
+                            }
+
+                        } else {
+                            if ($openAiModel -eq "gpt-3.5-turbo" -or $openAiModel -eq "gpt-4") {
+                                
+                                $filenameJson = Invoke-ChatGPTAPI -apiKey $Settings.OpenAIKey -prompt $usePrompt -startSystem $promptForFilename -model $openAiModel
+                                
+                                try {
+                                    $jsonObject = $filenameJson | ConvertFrom-Json
+                                    $filename = $jsonObject.filename
+                                } catch {
+                                    Write-Host "Error: Failed to parse JSON for filename."
+                                    $filename = $null
+                                }
+                                
+                            } else {
+                                $usePrompt = "$($usePrompt) $($promptForFilename)"
+                                $filenameJson = Invoke-ChatGPTAPI -apiKey $Settings.OpenAIKey -prompt $usePrompt -model $openAiModel
+                                
+                                try {
+                                    $jsonObject = $filenameJson | ConvertFrom-Json
+                                    $filename = $jsonObject.filename
+                                } catch {
+                                    Write-Host "Error: Failed to parse JSON for filename."
+                                    $filename = $null
+                                }
+                            }   
                         }
 
-                    } else {
-                        if ($openAiModel -eq "gpt-3.5-turbo" -or $openAiModel -eq "gpt-4") {
-                            
-                            $filenameJson = Invoke-ChatGPTAPI -apiKey $Settings.OpenAIKey -prompt $usePrompt -startSystem $promptForFilename -model $openAiModel
-                            
-                            try {
-                                $jsonObject = $filenameJson | ConvertFrom-Json
-                                $filename = $jsonObject.filename
-                            } catch {
-                                Write-Host "Error: Failed to parse JSON for filename."
-                                $filename = $null
-                            }
-                            
+                        if ([string]::IsNullOrEmpty($filename)) {
+                            $timestamp = Get-Date -Format "yyyyMMdd-HHmmss"
+                            $filename = "source_$($timestamp).txt"
                         } else {
-                            $usePrompt = "$($usePrompt) $($promptForFilename)"
-                            $filenameJson = Invoke-ChatGPTAPI -apiKey $Settings.OpenAIKey -prompt $usePrompt -model $openAiModel
-                            
-                            try {
-                                $jsonObject = $filenameJson | ConvertFrom-Json
-                                $filename = $jsonObject.filename
-                            } catch {
-                                Write-Host "Error: Failed to parse JSON for filename."
-                                $filename = $null
-                            }
-                        }   
-                    }
-
-                    if ([string]::IsNullOrEmpty($filename)) {
+                            $filename = $($filename)
+                        }
+                        
+                    } else {
                         $timestamp = Get-Date -Format "yyyyMMdd-HHmmss"
                         $filename = "source_$($timestamp).txt"
-                    } else {
-                        $filename = $($filename)
                     }
-                    
-                } else {
-                    $timestamp = Get-Date -Format "yyyyMMdd-HHmmss"
-                    $filename = "source_$($timestamp).txt"
-                }
-        
-                $uniqueFilename = Get-UniqueFilename -filename $filename -folder $SessionFolder
+            
+                    $uniqueFilename = Get-UniqueFilename -filename $filename -folder $SessionFolder
+                    Write-Host $uniqueFilename -ForegroundColor DarkMagenta
 
-                Debug -debugText "Debug: Filename = $($filename)"
-                SaveCodeToFile -filename $uniqueFilename -content $code
-            # }
+                    Debug -debugText "Debug: Filename = $($filename)"
+                    SaveCodeToFile -filename $uniqueFilename -content $code
+                # }
+            }
         }
     }
 
@@ -174,7 +182,7 @@ function GetProperties {
         },
         @{
             Name  = "Filename System Prompt"
-            Value = "Return ONLY the JSON [code]{ 'filename': [filename] }[/code] Where [filename] is the file name for the code. (If you can not find the filename then make one up based on the code and type.)"
+            Value = "Respond with ONLY a JSON [code]{ 'filename': [filename] }[/code]. The prompt should have a filename commented out at the type of the code to set to the [filename] value in the response JSON. (If not then create a filename (with extension) from the code itself.)"
             Type  = "String"
         },
         @{

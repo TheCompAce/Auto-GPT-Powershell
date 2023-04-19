@@ -4,28 +4,28 @@ function Is-LikelyCode {
         [double]$thresholdPct = 4.0
     )
 
-    $patterns = @{
+    $languages = @{
         'common' = @(
             "=", ";", "{", "}", "(", ")", ",", "\"", "&#39;", "/*", "*/", "//", "#", "!", "@", "%", "&", "*", "-", "+",
             ".", "?", "|", "^", "~", ">", "<", "/", ":", "§", "£", "€", "¥", "©", "®", "™", "¶", "•", "†", "‡", "°", "·"
         )
         'html' = @(
-            "<\w+>", "</\w+>", "/>", "<!--", "-->", "<![CDATA[", "]]>", "<!DOCTYPE", "<?xml", "xmlns"
+            "<", ">", "</", "/>", "<!--", "-->", "<![CDATA[", "]]>", "<!DOCTYPE", "<?xml", "xmlns"
         )
         'css' = @(
-            "\w+:\s*[\w\s,#\(\)]+;"
+            "margin", "padding", "border", "background", "font", "color", "width", "height", "display", "position"
         )
         'javascript' = @(
-            "function\s+\w+\s*\(", "class\s+\w+", "if\s*\(.*\)", "else", "for\s*\(.*\)", "while\s*\(.*\)", "return", "var\s+\w+", "let\s+\w+", "const\s+\w+", "import\s+\w+", "export\s+\w+", "extends", "implements"
+            "function", "class", "if", "else", "for", "while", "return", "var", "let", "const", "import", "export", "extends", "implements"
         )
         'java' = @(
-            "public\s+\w+", "private\s+\w+", "protected\s+\w+", "static\s+\w+", "final\s+\w+", "class\s+\w+", "interface\s+\w+", "extends", "implements", "new", "try", "catch", "throw"
+            "public", "private", "protected", "static", "final", "class", "interface", "extends", "implements", "new", "try", "catch", "throw"
         )
         'csharp' = @(
-            "using\s+\w+", "namespace\s+\w+", "public\s+\w+", "private\s+\w+", "protected\s+\w+", "static\s+\w+", "class\s+\w+", "interface\s+\w+", "abstract\s+\w+", "sealed\s+\w+", "override\s+\w+", "virtual\s+\w+", "new", "try", "catch", "throw"
+            "using", "namespace", "public", "private", "protected", "static", "class", "interface", "abstract", "sealed", "override", "virtual", "new", "try", "catch", "throw"
         )
         'cplusplus' = @(
-            "#include\s+<\w+>", "int\s+\w+", "float\s+\w+", "double\s+\w+", "char\s+\w+", "bool\s+\w+", "void\s+\w+", "public\s+\w+", "private\s+\w+", "protected\s+\w+", "static\s+\w+", "class\s+\w+", "namespace\s+\w+", "new", "delete", "try", "catch", "throw"
+            "#include", "int", "float", "double", "char", "bool", "void", "public", "private", "protected", "static", "class", "namespace", "new", "delete", "try", "catch", "throw"
         )
         'json' = @(
             "{", "}", "[", "]", ":", ","
@@ -33,33 +33,53 @@ function Is-LikelyCode {
         'asm' = @(
             "mov", "jmp", "call", "ret", "push", "pop", "add", "sub", "mul", "div", "cmp", "jz", "jnz", "ja", "jb"
         )
+        'ruby' = @(
+            "def\s+\w+\s*\(", "class\s+\w+", "module\s+\w+", "if\s+\w+", "else", "elsif\s+\w+", "for\s+\w+\s+in\s+\w+", "while\s+\w+", "until\s+\w+", "case\s+\w+", "when\s+\w+", "return", "begin", "rescue", "ensure", "end"
+        )
+        'go' = @(
+            "package\s+\w+", "import\s+\(.*\)", "func\s+\w+\s*\(", "type\s+\w+\s+struct", "const\s+\w+", "var\s+\w+", "interface\s+\w+", "if\s+\w+", "else", "for\s+\w+", "range\s+\w+", "switch\s+\w+", "case\s+\w+", "return", "defer", "go\s+\w+", "select\s+\w+", "default"
+        )
+
+        'swift' = @(
+            "import\s+\w+", "func\s+\w+\s*\(", "class\s+\w+", "struct\s+\w+", "enum\s+\w+", "protocol\s+\w+", "extension\s+\w+", "if\s+\w+", "else", "for\s+\w+\s+in\s+\w+", "while\s+\w+", "switch\s+\w+", "case\s+\w+", "return", "try", "catch", "throw", "guard\s+\w+", "let\s+\w+", "var\s+\w+", "print\s*\("
+        )
+
+        'kotlin' = @(
+            "import\s+\w+", "fun\s+\w+\s*\(", "class\s+\w+", "interface\s+\w+", "data\s+class\s+\w+", "val\s+\w+", "var\s+\w+", "if\s+\w+", "else", "for\s+\w+\s+in\s+\w+", "while\s+\w+", "return", "try", "catch", "throw", "when\s*\(", "is\s+\w+", "as\s+\w+"
+        )
+
+        'rust' = @(
+            "use\s+\w+", "fn\s+\w+\s*\(", "pub\s+\w+", "struct\s+\w+", "enum\s+\w+", "impl\s+\w+", "trait\s+\w+", "const\s+\w+", "let\s+\w+", "mut\s+\w+", "if\s+\w+", "else", "for\s+\w+\s+in\s+\w+", "while\s+\w+", "loop", "match\s+\w+", "return", "unsafe\s+\w+", "mod\s+\w+", "extern\s+\w+", "dyn\s+\w+"
+        )
+
+        'lua' = @(
+            "local\s+\w+", "function\s+\w+\s*\(", "if\s+\w+", "else", "elseif\s+\w+", "for\s+\w+\s+in\s+\w+", "while\s+\w+", "repeat\s+\w+", "until\s+\w+", "return", "end", "and", "or", "not\s+\w+", "require\s*\(", "module\s*\("
+        )
     }
 
-    $patternCounts = @{}
+    $languageCounts = @{}
 
-    foreach ($pattern in $patterns.Keys) {
-        $patternCounts[$pattern] = 0
-        foreach ($regex in $patterns[$pattern]) {
-            $patternCounts[$pattern] += ([regex]::Matches($code, $regex)).Count
+    foreach ($language in $languages.Keys) {
+        if ($language -eq "html") {
+            # Write-Host $language
+        }
+        $languageCounts[$language] = 0
+        foreach ($keyword in $languages[$language]) {
+            $languageCounts[$language] += ([regex]::Matches($code, [regex]::Escape($keyword))).Count
         }
     }
 
-    $totalOccurrences = [double]($patternCounts.Values | Measure-Object -Sum).Sum
+
+    $totalOccurrences = [double]($languageCounts.Values | Measure-Object -Sum).Sum
     if ($totalOccurrences -eq 0) {
         return $false
     }
 
-    $highestCount = ($patternCounts.Values | Measure-Object -Max).Maximum
-    $highestPct = ($highestCount / $totalOccurrences) * 100
+    $highestCount = ($languageCounts.Values | Measure-Object -Max).Maximum
+    $highestPct = ($highestCount / $totalOccurrences) * 10    
 
-    Debug -debugText "Debug: Is-LikelyCode highest percent $($highestPct)."
-
-    Write-Host $highestPct -ForegroundColor DarkGreen
-
-    return $highestPct -ge $thresholdPct
+    return $highestPct
 }
-
-
 
 function Is-LikelyNaturalLanguage {
     param (
@@ -74,7 +94,7 @@ function Is-LikelyNaturalLanguage {
     $totalLinesCount = $lines.Count
 
     foreach ($line in $lines) {
-        if (Is-LikelyCode $line -thresholdPct 4.0) {
+        if (Is-LikelyCode $line -ge 4.0) {
             $codeLinesCount++
         } else {
             $matches = [regex]::Matches($line, $pattern)
@@ -99,9 +119,6 @@ function Is-LikelyNaturalLanguage {
     }
 
     $overallNlpPercentage = ($nlpLinesCount / $totalLinesCount) * 100
-    Debug -debugText "Debug: Is-LikelyNaturalLanguage overall percentage: $($overallNlpPercentage)."
 
-    Write-Host $overallNlpPercentage -ForegroundColor Green
-
-    return $overallNlpPercentage -ge $thresholdPct
+    return $overallNlpPercentage
 }

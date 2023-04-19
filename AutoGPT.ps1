@@ -71,7 +71,7 @@ if (-not $StartingPrompt -and (-not $StartPromptFilePath)) {
     $prompt = $StartingPrompt
 }
 
-Debug -debugText "Start Prompt: $($prompt)"
+
 
 if ($Settings.UseChatGPT -and ($Settings.OpenAiModel -eq "gpt-3.5-turbo" -or $Settings.OpenAiModel -eq "gpt-4")) {
     if (-not $SystemPrompt -and (-not $SystemPromptFilePath)) {
@@ -109,7 +109,8 @@ Debug -debugText "Starting AutoGPT System"
 
 # Run start plugins
 # . .\module\RunStartPlugins.ps1
-$prompt = RunPluginsByType -pluginType 0 -prompt $prompt
+$prompt = RunPluginsByType -pluginType 0 -prompt $prompt -response $response -system $startSystem
+Debug -debugText "Start Prompt: $($prompt)"
 
 $runCt = 0
 # Main loop
@@ -117,20 +118,21 @@ do {
 
     if ($Settings.UseChatGPT -and $Settings.OpenAiModel -ne "text-davinci-003") {
 
+        $setStart = $startSystem
         Debug -debugText "System : $($startSystem)"
     
         # Run input plugins
         # . .\module\RunSystemPlugins.ps1
-        $startSystem = RunPluginsByType -pluginType 1 -prompt $prompt -response $response -system $startSystem
+        $setStart = RunPluginsByType -pluginType 1 -prompt $prompt -response $response -system $setStart
     
-        Debug -debugText "System: $($startSystem)"
+        Debug -debugText "System: $($setStart)"
     }
 
     Debug -debugText "Prompt: $($prompt)"
 
     # Run input plugins
     # . .\module\RunInputPlugins.ps1
-    $prompt = RunPluginsByType -pluginType 2 -prompt $prompt -response $response -system $startSystem
+    $prompt = RunPluginsByType -pluginType 2 -prompt $prompt -response $response -system $setStart
 
     Debug -debugText "Prompt: $($prompt)"
     . .\module\RunChatGPTAPI.ps1
@@ -139,7 +141,7 @@ do {
     # Run GPT-4 executable or ChatGPT API
     if ($Settings.UseChatGPT) {
         
-        $response = Invoke-ChatGPTAPI -apiKey $Settings.OpenAIKey -prompt $prompt -startSystem $startSystem -model $Settings.OpenAiModel
+        $response = Invoke-ChatGPTAPI -apiKey $Settings.OpenAIKey -prompt $prompt -startSystem $setStart -model $Settings.OpenAiModel
 
     } else {
         
@@ -150,8 +152,9 @@ do {
 
     # Run output plugins
     # . .\module\RunOutputPlugins.ps1
-    $response = RunPluginsByType -pluginType 3 -prompt $prompt -response $response -system $startSystem
+    $response = RunPluginsByType -pluginType 3 -prompt $prompt -response $response -system $setStart
 
+    
     $prompt = $response
 
     Debug -debugText "Response: $($response)"

@@ -113,7 +113,7 @@
           "Type": "Boolean"
         },
         {
-          "Value": "Return ONLY the JSON [code]{ 'filename': [filename] }[/code] Where [filename] is the file name for the code. (If you can not find the filename then make one up based on the code and type.)",
+          "Value": "Respond with ONLY a JSON [code]{ 'filename': [filename] }[/code]. The prompt should have a filename commented out at the type of the code to set to the [filename] value in the response JSON. (If not then create a filename (with extension) from the code itself.)",
           "Name": "Filename System Prompt",
           "Type": "String"
         },
@@ -143,7 +143,7 @@
           "Type": "Int"
         },
         {
-          "Value": "Add the filename (and path) as a comment to the top of all code blocks.",
+          "Value": "The [main] should be responsible for the primary functionality of the prompt, while the [codeSaver] should handle saving and retrieving code snippets. For each code example provided, include a comment at the top of the code with the filename (and path if needed).",
           "Name": "Add To System Prompt",
           "Type": "String"
         }
