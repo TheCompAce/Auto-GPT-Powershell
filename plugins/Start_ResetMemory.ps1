@@ -3,7 +3,7 @@ Param(
     [array]$ArgumentList
 )
 function GetFullName {
-    return "Output Session Log Plugin"
+    return "Start Reset Plugin"
 }
 
 function Run {
@@ -14,10 +14,12 @@ function Run {
     )
 
     Debug -debugText "$(GetFullName) Running"
-    Add-Content -Path $SessionFile -Value "System: $system`nPrompt: $prompt`nResponse: $response"
 
+    $props = GetProperties
+    $propVal = GetProperty -properties $props -propertyName "Start Prompt Reset"
+    $prompt = "$($propVal) $($prompt)"
     # This file takes in the "Prompt" and returns it without changing it.
-    return $response
+    return $prompt
 }
 
 function GetProperties {
@@ -34,6 +36,11 @@ function GetProperties {
             Name  = "Order"
             Value = 99
             Type  = "Int"
+        },
+        @{
+            Name  = "Start Prompt Reset"
+            Value = "Forget any previous Session."
+            Type  = "String"
         }
     )
 
@@ -50,12 +57,13 @@ function GetConfigurable {
 }
 
 function GetPluginType {
-    return 3 # Output Plugin
+    return 0 # Start Plugin
 }
 
 # ////////////////////////////////////////////////////////////
 # Common Code do not change unles you want to break something.
 # ////////////////////////////////////////////////////////////
+
 
 switch ($FunctionName) {
     "GetFullName" { return GetFullName }
@@ -65,4 +73,3 @@ switch ($FunctionName) {
     "GetProperties" { return GetProperties }
     default { Write-Host "Invalid function name" }
 }
-

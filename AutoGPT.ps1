@@ -106,7 +106,7 @@ if ([string]::IsNullOrEmpty($SessionFile)) {
 Debug -debugText "Starting AutoGPT System"
 
 
-
+Debug -debugText "Start Prompt: $($prompt)"
 # Run start plugins
 # . .\module\RunStartPlugins.ps1
 $prompt = RunPluginsByType -pluginType 0 -prompt $prompt -response $response -system $startSystem

@@ -13,11 +13,11 @@ function Run {
         [string]$system
     )
 
-    Debug -debugText "Debug: $(GetFullName)"
+    Debug -debugText "$(GetFullName) Running"
 
     $props = GetProperties
     $propVal = GetProperty -properties $props -propertyName "Add To System Prompt"
-    $system = "$($system). The following '[codeSaver]' section should handle the formating of responses with source code in it. [codeSaver]$($propVal)[/codeSaver]"
+    $system = "The following '[codeSaver]' section should handle the formating of responses with source code in it. [codeSaver]$($propVal)[/codeSaver] $($system)"
 
     return $system
 }
@@ -26,11 +26,7 @@ function GetProperties {
     $setName = GetFullName
     $propertiesFromFile = GetPluginPropertiesFromFile -pluginName $setName
 
-    if ($propertiesFromFile -ne $null) {
-        return $propertiesFromFile
-    }
-
-    $properties = @(
+    $defaultProperties = @(
         @{
             Name  = "Enabled"
             Value = $false
@@ -47,7 +43,13 @@ function GetProperties {
             Type  = "String"
         }
     )
-    return $properties
+    
+    if ($propertiesFromFile -ne $null) {
+        $updatedProperties = MergeAndSaveProperties -pluginName $setName -defaultProperties $defaultProperties -loadedProperties $propertiesFromFile
+        return $updatedProperties
+    }
+
+    return $defaultProperties
 }
 
 function GetConfigurable {

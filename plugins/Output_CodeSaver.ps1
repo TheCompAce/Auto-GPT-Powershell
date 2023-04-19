@@ -16,7 +16,7 @@ function Run {
 
     . .\module\CodeWorker.ps1
 
-    Debug -debugText "Debug: $(GetFullName)"
+    Debug -debugText "$(GetFullName) Running"
     # Check For Code in the Response
 
     $props = GetProperties
@@ -134,11 +134,7 @@ function GetProperties {
     $setName = GetFullName
     $propertiesFromFile = GetPluginPropertiesFromFile -pluginName $setName
 
-    if ($propertiesFromFile -ne $null) {
-        return $propertiesFromFile
-    }
-
-    $properties = @(
+    $defaultProperties = @(
         @{
             Name  = "Enabled"
             Value = $false
@@ -202,8 +198,14 @@ function GetProperties {
         }
     )
 
-    return $properties
+    if ($propertiesFromFile -ne $null) {
+        $updatedProperties = MergeAndSaveProperties -pluginName $setName -defaultProperties $defaultProperties -loadedProperties $propertiesFromFile
+        return $updatedProperties
+    }
+
+    return $defaultProperties
 }
+
 
 function GetConfigurable {
     return "True"

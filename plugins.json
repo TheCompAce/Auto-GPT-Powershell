@@ -113,7 +113,7 @@
           "Type": "Boolean"
         },
         {
-          "Value": "Respond with ONLY a JSON [code]{ 'filename': [filename] }[/code]. The prompt should have a filename commented out at the type of the code to set to the [filename] value in the response JSON. (If not then create a filename (with extension) from the code itself.)",
+          "Value": "Respond with ONLY a JSON [code]{ 'filename': [filename], 'iscode': [iscode] }[/code]. The prompt should have a filename commented out at the type of the code to set to the [filename] value in the response JSON. (If not then create a filename (with extension) from the code itself.) And for the [iscode] set the value to a boolean value of true if the prompt is source code, or false if it is just text.",
           "Name": "Filename System Prompt",
           "Type": "String"
         },
@@ -143,12 +143,32 @@
           "Type": "Int"
         },
         {
-          "Value": "The [main] should be responsible for the primary functionality of the prompt, while the [codeSaver] should handle saving and retrieving code snippets. For each code example provided, include a comment at the top of the code with the filename (and path if needed).",
+          "Value": "Add the code filename (and path if needed) as a comment on all code block (i.e. \"# filename.py\\nprint('Hello, world!')\")",
           "Name": "Add To System Prompt",
           "Type": "String"
         }
       ],
       "FullName": "System Code Saver Plugin"
+    },
+    {
+      "Properties": [
+        {
+          "Value": false,
+          "Name": "Enabled",
+          "Type": "Boolean"
+        },
+        {
+          "Value": "1",
+          "Name": "Order",
+          "Type": "Int"
+        },
+        {
+          "Value": "Reset the chatGPT to a default state to follow all prompts.",
+          "Name": "Start Prompt Reset",
+          "Type": "String"
+        }
+      ],
+      "FullName": "Start Reset Plugin"
     }
   ]
 }

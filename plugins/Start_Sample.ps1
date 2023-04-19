@@ -13,7 +13,7 @@ function Run {
         [string]$system
     )
 
-    Debug -debugText "Debug: $(GetFullName)"
+    Debug -debugText "$(GetFullName) Running"
     # This file takes in the "Prompt" and returns it without changing it.
     return $prompt
 }
@@ -22,11 +22,7 @@ function GetProperties {
     $setName = GetFullName
     $propertiesFromFile = GetPluginPropertiesFromFile -pluginName $setName
 
-    if ($propertiesFromFile -ne $null) {
-        return $propertiesFromFile
-    }
-
-    $properties = @(
+    $defaultProperties = @(
         @{
             Name  = "Enabled"
             Value = $false
@@ -38,7 +34,13 @@ function GetProperties {
             Type  = "Int"
         }
     )
-    return $properties
+
+    if ($propertiesFromFile -ne $null) {
+        $updatedProperties = MergeAndSaveProperties -pluginName $setName -defaultProperties $defaultProperties -loadedProperties $propertiesFromFile
+        return $updatedProperties
+    }
+
+    return $defaultProperties
 }
 
 function GetConfigurable {

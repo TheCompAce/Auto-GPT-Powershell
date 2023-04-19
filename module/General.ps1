@@ -22,6 +22,44 @@ function Get-UniqueFilename {
         $number++
     }
 }
+
+function RunPluginsByType {
+    Param(
+        [string]$pluginType,
+        [string]$prompt,
+        [string]$response,
+        [string]$system
+    )
+
+
+    $plugins = GetPluginsOfType -PluginType $pluginType | Sort-Object { (GetProperty -properties (& $_.FullName -FunctionName "GetProperties") -propertyName "Order") }
+    
+    if ($pluginType -eq 1) {
+        $retValue = $system
+    } elseif ($pluginType -eq 3) {
+        $retValue = $response
+    } else {
+        $retValue = $prompt
+    }
+    
+    for ($i = 0; $i -lt $plugins.Count; $i++) {
+        $properties = & $plugins[$i].FullName -FunctionName "GetProperties"
+        $enabled = GetProperty -properties $properties -propertyName "Enabled"
+        
+        if ($enabled) {
+            if ($pluginType -eq 1) {
+                $retValue = & $plugins[$i].FullName -FunctionName "Run" -ArgumentList @($prompt, $response, $retValue)
+            } elseif ($pluginType -eq 3) {
+                $retValue = & $plugins[$i].FullName -FunctionName "Run" -ArgumentList @($prompt, $retValue, $system)
+            } else {
+                $retValue = & $plugins[$i].FullName -FunctionName "Run" -ArgumentList @($retValue, $response, $system)
+            }
+        }
+    }
+
+    return $retValue
+}
+
 function GetAllPlugins {
     $allPlugins = @()
     $pluginFiles = Get-ChildItem -Path ".\plugins" -Filter "*.ps1" | Sort-Object Name
@@ -54,41 +92,39 @@ function GetProperty {
     return $null
 }
 
-function RunPluginsByType {
+function GetPluginsOfType {
     Param(
-        [string]$pluginType,
-        [string]$prompt,
-        [string]$response,
-        [string]$system
+        [string]$PluginType
     )
 
-
-    $plugins = GetPluginsOfType -PluginType $pluginType | Sort-Object { (GetProperty -properties (& $_.FullName -FunctionName "GetProperties") -propertyName "Order") }
-    
-    if ($pluginType -eq 1) {
-        $retValue = $system
-    } elseif ($pluginType -eq 2) {
-        $retValue = $prompt
-    } else {
-        $retValue = $response
-    }
-    
-    for ($i = 0; $i -lt $plugins.Count; $i++) {
-        $properties = & $plugins[$i].FullName -FunctionName "GetProperties"
-        $enabled = GetProperty -properties $properties -propertyName "Enabled"
+    $allPlugins = GetAllPlugins
+    $retPlugins = @()
+    for ($i = 0; $i -lt $allPlugins.Count; $i++) {
+        $chkPluginType = & $allPlugins[$i].FullName -FunctionName "GetPluginType"
         
-        if ($enabled) {
-            if ($pluginType -eq 1) {
-                $retValue = & $plugins[$i].FullName -FunctionName "Run" -ArgumentList @($prompt, $response, $retValue)
-            } elseif ($pluginType -eq 2) {
-                $retValue = & $plugins[$i].FullName -FunctionName "Run" -ArgumentList @($retValue, $response, $System)
-            } else {
-                $retValue = & $plugins[$i].FullName -FunctionName "Run" -ArgumentList @($prompt, $retValue, $system)
-            }
+        if ($chkPluginType -eq $PluginType) {
+            $retPlugins += $allPlugins[$i]
         }
     }
 
-    return $retValue
+    return $retPlugins
+}
+
+
+function GetPluginNameFromType {
+    Param(
+        [string]$PluginType
+    )
+    $pluginStr = ""
+    switch ($PluginType) {
+        "0" { $pluginStr = "Start" }
+        "1" { $pluginStr = "System" }
+        "2" { $pluginStr = "Input" }
+        "3" { $pluginStr = "Output" }
+        Default { $pluginStr = "Unkown" }
+    }
+
+    return $pluginStr
 }
 
 function GetPluginPropertiesFromFile {
@@ -165,6 +201,33 @@ function SavePluginPropertiesToFile {
     $pluginsJson | ConvertTo-Json -Depth 10  | Set-Content $pluginsJsonPath
 }
 
+function MergeAndSaveProperties {
+    Param(
+        [string]$pluginName,
+        [array]$defaultProperties,
+        [array]$loadedProperties
+    )
+
+    $updatedProperties = @()
+    $propertyNames = $loadedProperties | ForEach-Object { $_.Name }
+
+    # Check for changes and update properties if necessary
+    foreach ($defaultProperty in $defaultProperties) {
+        $foundProperty = $loadedProperties | Where-Object { $_.Name -eq $defaultProperty.Name }
+        if ($foundProperty) {
+            $updatedProperties += $foundProperty
+        } else {
+            $updatedProperties += $defaultProperty
+        }
+    }
+
+    SavePluginPropertiesToFile -pluginName $pluginName -properties $updatedProperties
+    return $updatedProperties
+}
+
+
+
+
 function SaveCodeToFile {
     param (
         [string]$filename,
@@ -172,24 +235,6 @@ function SaveCodeToFile {
     )
 
     Set-Content -Path $filename -Value $content
-}
-
-function GetPluginsOfType {
-    Param(
-        [string]$PluginType
-    )
-
-    $allPlugins = GetAllPlugins
-    $retPlugins = @()
-    for ($i = 0; $i -lt $allPlugins.Count; $i++) {
-        $chkPluginType = & $allPlugins[$i].FullName -FunctionName "GetPluginType"
-        
-        if ($chkPluginType -eq $PluginType) {
-            $retPlugins += $allPlugins[$i]
-        }
-    }
-
-    return $retPlugins
 }
 
 function Debug {
@@ -200,22 +245,6 @@ function Debug {
     if ($Settings.Debug) {
         Write-Host "Debug: $($debugText)" -ForegroundColor Yellow
     }
-}
-
-function GetPluginNameFromType {
-    Param(
-        [string]$PluginType
-    )
-    $pluginStr = ""
-    switch ($PluginType) {
-        "0" { $pluginStr = "Start" }
-        "1" { $pluginStr = "System" }
-        "2" { $pluginStr = "Input" }
-        "3" { $pluginStr = "Output" }
-        Default { $pluginStr = "Unkown" }
-    }
-
-    return $pluginStr
 }
 
 
