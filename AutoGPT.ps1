@@ -1,11 +1,7 @@
 # AutoGPT.ps1
 Param(
-    [string]$model,
     [string]$pause,
     [string]$seed,
-    [bool]$UseChatGPT,
-    [string]$OpenAIKey,
-    [string]$OpenAiModel,
     [int]$LoopCount,
     [bool]$Debug,
     [string]$StartingPrompt,
@@ -13,74 +9,63 @@ Param(
     [string]$StartPromptFilePath,
     [string]$SystemPromptFilePath,
     [string]$SessionFolder,
-    [string]$SessionFile
+    [string]$SessionFile,
+    [string]$LocalGPTPath,
+    [string]$OnlineGPTPath,
+    [bool]$UseOnlineGPT,
+    [bool]$SendOnlyPromptToGPT,
+    [string]$GPTPromptScheme,
+    [bool]$UseOpenAIGPTAuth,
+    [string]$LocalTextToImagePath,
+    [string]$OnlineTextToImagePath,
+    [bool]$UseOnlineTextToImage,
+    [bool]$SendOnlyPromptToTextToImage,
+    [string]$TextToImagePromptScheme,
+    [bool]$UseOpenAIDalleAuth,
+    [string]$OnlineAPIKey,
+    [bool]$UseOpenAIDALLEAuthentication,
+    [bool]$UseOpenAIGPTAuthentication
 )
 
-. .\module\General.ps1
+. .\module\main\Crypt.ps1
+. .\module\main\General.ps1
 
 # Check if settings.json exists, create it with default settings if it doesn't
-if (-not (Test-Path "settings.json")) {
-    @{
-        model = "gpt4all-lora-quantized.bin"
-        pause = "y"
-        seed = ""
-        LoopCount = "10"
-        UseChatGPT = $false
-        OpenAIKey = ""
-        OpenAiModel = "gpt-3.5-turbo"
-        Debug = $false
-        AllowPluginGPTs = $false
-    } | ConvertTo-Json -Depth 10 | Set-Content -Path "settings.json"
+if (Test-Path "settings.json") {
+    $settings = ConvertFrom-Json (Get-Content -Path "settings.json" -Raw)
 }
 
-# Load settings from the settings file
-$settings = ConvertFrom-Json (Get-Content -Path "settings.json" -Raw)
+$settings = UpdateSettingsWithDefaults -Settings $settings
 
 # Apply parameters
-if ($model) { $settings.model = $model }
 if ($pause) { $settings.pause = $pause }
 if ($seed) { $settings.seed = $seed }
-if ($UseChatGPT) { $settings.UseChatGPT = $UseChatGPT }
-if ($OpenAIKey) { $settings.OpenAIKey = $OpenAIKey }
-if ($OpenAiModel) { $settings.OpenAiModel = $OpenAiModel }
 if ($LoopCount) { $settings.LoopCount = $LoopCount }
 if ($Debug) { $settings.Debug = $Debug }
 
-# Ask user if they want to check options, only if no options were passed as parameters
-if (-not ($model -or $pause -or $seed -or $UseChatGPT -or $OpenAIKey -or $OpenAiModel -or $LoopCount -or $Debug)) {
-    $checkOptions = Read-Host "Do you want to check options? (y)es/(n)o"
-    if ($checkOptions.ToLower() -eq 'y') {
-        . .\module\Options.ps1 -Settings $Settings
-        # Reload settings
-        $Settings = Get-Content -Path "settings.json" | ConvertFrom-Json
-    }
+$checkOptions = Read-Host "Do you want to check options? (y)es/(n)o"
+if ($checkOptions.ToLower() -eq 'y') {
+    . .\module\main\Options.ps1 -Settings $Settings
+    # Reload settings
+    $Settings = Get-Content -Path "settings.json" | ConvertFrom-Json
 }
 
 
-# . .\modules\VectorDB_PS\VectorDB.ps1
+# . .\modules\main\VectorDB_PS\VectorDB.ps1
 # Remove existing log files
 Remove-Item -Path "session.txt" -ErrorAction Ignore
 Remove-Item -Path "system.log" -ErrorAction Ignore
 
+. .\module\main\RunChatGPTAPI.ps1
+. .\module\main\RunGPT4Exe.ps1
+. .\module\main\RunDallEAPI.ps1
+
 # Set initial prompt
-if (-not $StartingPrompt -and (-not $StartPromptFilePath)) {
-    $prompt = Read-Host "Enter the starting prompt"
-} elseif ($StartPromptFilePath) {
-    $prompt = Get-Content -Path $StartPromptFilePath -Raw
-} else {
-    $prompt = $StartingPrompt
-}
+$prompt = Read-Host "Enter the starting prompt"
 
 
-
-if ($Settings.UseChatGPT -and ($Settings.OpenAiModel -eq "gpt-3.5-turbo" -or $Settings.OpenAiModel -eq "gpt-4")) {
-    if (-not $SystemPrompt -and (-not $SystemPromptFilePath)) {
-        $startSystem = Read-Host "Enter the start system"
-    } elseif ($SystemPromptFilePath) {
-        $startSystem = Get-Content -Path $SystemPromptFilePath -Raw
-    } else {
-        $startSystem = $SystemPrompt
-    }
+if ($Settings.UseOnlineGPT -and -not $Settings.SendOnlyPromptToGPT) {
+    $startSystem = Read-Host "Enter the start system"
 }
 
 # Create the "sessions" folder if it doesn't exist
@@ -90,40 +75,50 @@ if (-not (Test-Path $defaultSessionFolder)) {
 }
 
 if ([string]::IsNullOrEmpty($SessionFolder)) {
-    $timestamp = Get-Date -Format "yyyyMMdd-HHmmss"
-    $sessionFolder = Join-Path $defaultSessionFolder "session_$timestamp"
+    $timeStamp = Get-Date -Format "yyyyMMddHHmmss"
+    $global:sessionFolder = Join-Path $defaultSessionFolder "session_$timestamp"
 }
 
-if (-not (Test-Path $sessionFolder)) {
-    New-Item -ItemType Directory -Path $sessionFolder | Out-Null
+if (-not (Test-Path $global:sessionFolder)) {
+    New-Item -ItemType Directory -Path $global:sessionFolder | Out-Null
 }
+$global:taskComplete = $false
 
-if ([string]::IsNullOrEmpty($SessionFile)) {
-    $timestamp = Get-Date -Format "yyyyMMdd-HHmmss"
-    $SessionFile = Join-Path $SessionFolder "session_$($timestamp).txt"
-}
+$timeStamp = Get-Date -Format "yyyyMMddHHmmss"
+$SessionFile = Join-Path $global:SessionFolder "session_$($timestamp).txt"
 
 Debug -debugText "Starting AutoGPT System"
 
-
 Debug -debugText "Start Prompt: $($prompt)"
 # Run start plugins
-# . .\module\RunStartPlugins.ps1
+# . .\module\main\RunStartPlugins.ps1
 $prompt = RunPluginsByType -pluginType 0 -prompt $prompt -response $response -system $startSystem
+
+if ($global:taskComplete -eq $true) {
+    exit
+}
 Debug -debugText "Start Prompt: $($prompt)"
 
+
+
 $runCt = 0
+$firestLoop = $true;
 # Main loop
+
 do {
 
-    if ($Settings.UseChatGPT -and $Settings.OpenAiModel -ne "text-davinci-003") {
+    if ($Settings.UseOnlineGPT -and $Settings.OpenAiModel -ne "text-davinci-003") {
 
         $setStart = $startSystem
         Debug -debugText "System : $($startSystem)"
     
         # Run input plugins
-        # . .\module\RunSystemPlugins.ps1
+        # . .\module\main\RunSystemPlugins.ps1
         $setStart = RunPluginsByType -pluginType 1 -prompt $prompt -response $response -system $setStart
+
+        if ($global:taskComplete -eq $true) {
+            exit
+        }
     
         Debug -debugText "System: $($setStart)"
     }
@@ -131,38 +126,50 @@ do {
     Debug -debugText "Prompt: $($prompt)"
 
     # Run input plugins
-    # . .\module\RunInputPlugins.ps1
+    # . .\module\main\RunInputPlugins.ps1
     $prompt = RunPluginsByType -pluginType 2 -prompt $prompt -response $response -system $setStart
 
+    if ($global:taskComplete -eq $true) {
+        exit
+    }
+
     Debug -debugText "Prompt: $($prompt)"
-    . .\module\RunChatGPTAPI.ps1
-    . .\module\RunGPT4Exe.ps1
+
 
     # Run GPT-4 executable or ChatGPT API
-    if ($Settings.UseChatGPT) {
-        
-        $response = Invoke-ChatGPTAPI -apiKey $Settings.OpenAIKey -prompt $prompt -startSystem $setStart -model $Settings.OpenAiModel
-
+    Write-Host "Asking GPT the prompt: Ct $($runCt)" -ForegroundColor Green
+    if ($Settings.UseOnlineGPT) {
+        $response = Invoke-ChatGPTAPI -prompt $prompt -system $setStart
     } else {
-        
-        $response = Invoke-GPT4ALL -prompt $prompt -model $Settings.model
+        $response = Invoke-GPT4ALL -prompt $prompt -response $response -system $setStart
     }
+
+    if ($global:taskComplete -eq $true) {
+        exit
+    }
+
+    Write-Host "GPT Responded: Ct $($runCt)" -ForegroundColor Green
 
     Debug -debugText "Response: $($response)"
 
     # Run output plugins
-    # . .\module\RunOutputPlugins.ps1
+    # . .\module\main\RunOutputPlugins.ps1
     $response = RunPluginsByType -pluginType 3 -prompt $prompt -response $response -system $setStart
 
-    
+    if ($global:taskComplete -eq $true) {
+        exit
+    }
+
     $prompt = $response
 
     Debug -debugText "Response: $($response)"
 
+    & ClearTempFolder
+
     # Pause if selected
-    if ($settings.pause.ToLower() -eq "y") {
+    if ($settings.pause.ToLower() -eq "y" -and -not $global:taskComplete) {
         $null = Read-Host "Press Enter to continue, or Ctrl+C to exit"
     }
 
     $runCt++
-} while ($true -and $runCt -lt $settings.LoopCount)
+} while ($runCt -lt $settings.LoopCount -or $global:taskComplete)

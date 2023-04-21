@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Image Gallery</title>
+    <style>
+        .grid-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            grid-gap: 10px;
+            padding: 10px;
+        }
+        img {
+            width: 100%;
+            height: auto;
+            object-fit: cover;
+        }
+    </style>
+</head>
+<body>
+    <div class="grid-container" id="grid-container">
+        <!-- Images will be added here -->
+    </div>
+    <script>
+        // Paste the content of prompts.json here
+
+        var gridContainer = document.getElementById('grid-container');
+        jsonData.images.forEach(function(image) {
+            var imagePath = './' + image.Folder + '/' + image.Filename;
+
+            var img = document.createElement('img');
+            img.src = imagePath;
+            img.width = 128;
+            img.height = 128;
+            img.onclick = function() {
+                window.open(imagePath, '_blank');
+            };
+
+            gridContainer.appendChild(img);
+        });
+    </script>
+</body>
+</html>

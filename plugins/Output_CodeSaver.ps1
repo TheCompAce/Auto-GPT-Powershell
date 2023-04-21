@@ -14,7 +14,7 @@ function Run {
         [string]$system
     )
 
-    . .\module\CodeWorker.ps1
+    . .\module\plugins\CodeWorker.ps1
 
     Debug -debugText "$(GetFullName) Running"
     # Check For Code in the Response
@@ -30,12 +30,109 @@ function Run {
         $offlineModel = GetProperty -properties $props -propertyName "Offline Model"
     } else {
         $openAiModel = $Settings.OpenAiModel
-        $useOffline = -not $Settings.UseChatGPT
+        $useOffline = -not $Settings.UseOnlineGPT
         $offlineModel = $Settings.model
     }
 
 
-    $codePattern = "(?s)(?<=```).*?(?=```)"
+    $plugin = GetPluginByName -pluginName "Output Code Saver Plugin"
+    
+    if ($plugin -ne $null) {
+        $properties = & $plugins[$i].FullName -FunctionName "GetProperties"
+
+        $useGPTFilename = GetProperty -properties $props -propertyName "Use GPT to Get Filenames"
+        $promptForFilename = GetProperty -properties $props -propertyName "Filename System Prompt"
+        $overideGPT = GetProperty -properties $props -propertyName "Override GPT"
+    
+        if ($overideGPT) {
+            $openAiModel = GetProperty -properties $props -propertyName "ChatGPT Model"
+            $useOffline = GetProperty -properties $props -propertyName "Use Offline GPT"
+            $offlineModel = GetProperty -properties $props -propertyName "Offline Model"
+        } else {
+            $openAiModel = $Settings.OpenAiModel
+            $useOffline = -not $Settings.UseOnlineGPT
+            $offlineModel = $Settings.model
+        }
+
+        $workSpace = GetProperty -properties $properties -propertyName "WorkerSpace"
+
+        $workSpaceObject = $global:globalCodeSaverWorkspace | ConvertFrom-Json
+
+        if ($workSpaceObject -ne $null) {
+            if (-not $workSpaceObject.Completed) {
+                if ($workSpaceObject.Phases -ne $null) {
+                    $devFound = $false
+                    foreach ($phase in $workSpaceObject.Phases) {
+                        if ($phase.Name -eq "Development") {
+                            $devData = $phase
+                            $devFound = $true
+                            break
+                        }
+                    }
+
+                    if ($devFound) {
+                        if (-not $devData.Completed) {
+                            $myProps = GetProperties
+                            $currentStep = $devData.CurrentStep; 
+
+                            if ($currentStep -eq 1) {
+                                $step1Prompt = GetProperty -properties $myProps -propertyName "Step 1 Input Prompt"
+                                $stepsCompleted = $true;
+                                for ($i = 0; $i -lt $devData.Steps.Count; $i++) {
+                                    if ($devData.Steps[$i].Completed -eq $false) {
+                                        $currentStepData = $devData.Steps[$i]
+                                        $stepsCompleted = $false
+                                        break
+                                    }
+                                }
+                                if (-not $stepsCompleted) {
+                                    try {
+                                        $dataChanged = $false
+                                        $responseData = $response.Trim() | ConvertFrom-Json
+
+                                        $fileFound = $false
+                                        foreach ($file in $responseData.Files) {
+                                            foreach ($datFile in $devData.Files) {
+                                                if ($datFile.Filename -eq $file) {
+
+                                                }
+                                            }
+                                        }
+                                    
+                                    return $codePrompt
+                                    } catch {
+                                        Write-Host "Code Saver: Unable to get JSON from Response (try again?, yeah retrying.)" -ForegroundColor Yellow
+                                    }
+                                } else {
+                                    Write-Host "Code Saver: Code Completd." -ForegroundColor Yellow
+                                }
+                            } else {
+                                Write-Host "Code Saver Error: Unknown Step." -ForegroundColor Red
+                                $global:taskComplete = $true
+                            }
+                        } else {
+                            Write-Host "Code Saver: Code Completd." -ForegroundColor Green
+                        }
+                    } else {
+                        Write-Host "Code Saver Error: Unable to find Development." -ForegroundColor Red
+                        $global:taskComplete = $true
+                    }
+                } else {
+                    Write-Host "Code Saver Error: Unable to find Phases." -ForegroundColor Red
+                    $global:taskComplete = $true
+                }
+            } else {
+                Write-Host "Code Saver: Project Completd." -ForegroundColor Green
+                $global:taskComplete = $true
+            }
+        } else {
+            Write-Host "Code Saver Error: Work Space is Null." -ForegroundColor Red
+            $global:taskComplete = $true
+        }   
+    }
+
+
+    <# $codePattern = "(?s)(?<=```).*?(?=```)"
     $codeMatches = [regex]::Matches($response, $codePattern)
     
     foreach ($match in $codeMatches) {
@@ -59,7 +156,7 @@ function Run {
             
                     $iscode = $true;
                     if ($useGPTFilename) {
-                        $usePrompt = "$($code)"
+                        $usePrompt = "[Reference]$($response)[/Reference][Code]$($code)[/Code]"
                         
                         if ($useOffline) {
                             $filenameJson = Invoke-GPT4ALL -prompt $usePrompt -model $offlineModel
@@ -123,7 +220,7 @@ function Run {
                 # }
             }
         }
-    }
+    } #>
 
 
     # Respond with the Prompt so it can be passed on.
@@ -195,6 +292,11 @@ function GetProperties {
             Name  = "Edit Source System Prompt"
             Value = ""
             Type  = "String"
+        }
+        @{
+            Name  = "WorkerSpace"
+            Value = ""
+            Type  = "Temp"
         }
     )
 
