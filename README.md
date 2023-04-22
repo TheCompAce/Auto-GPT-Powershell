@@ -1,6 +1,8 @@
 # AutoGPT_PS 😄
 
-AutoGPT_PS is a PowerShell script that runs GPT-4, processes user input, and returns generated responses. The script includes a plugin system that allows for easy customization of input processing, output formatting, and more.
+AutoGPT_PS is a PowerShell script that runs Local GPT (LM) programs, in a automatic fashion. The main goal is to ask the user's prompt, and keep feeding the idea to the AI (in a loop) and see what happens. The plugin System allows changing the Prompt from the "Start", then on every Loop a plugin "System" (to change the "System Prompt")  and "Input" (to change the "Prompt") then ask the GPT, then a plugin for "Output", then Loops back to "System".  The plugins are made to pass the prompt from one to the other in the sections ("Start", "System", "Input", and "Output") plugin list based of a "Order" property.
+
+
 
 ## Usage 🚀
 
@@ -64,9 +66,9 @@ The plugin system is based on separate modules for different types of plugins:
 AutoGPT_PS includes a plugin system that allows for easy customization of input processing, output formatting, and more. There are four types of plugins:
 
 1. Start plugins
-2. Input plugins
-3. Output plugins
-4. System plugins
+2. System plugins
+3. Input plugins
+4. Output plugins
 
 For the base setup of each plugin type, see the scripts provided in the "plugins" folder.
 
