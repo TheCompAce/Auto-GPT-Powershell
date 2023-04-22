@@ -211,68 +211,45 @@ function ConfigureAdvancedOptions {
     }
 }
 
-function ShowOptions {
-    Write-Host "Basic Settings:" -ForegroundColor Green
-    Write-Host "1. Toggle Pause ($($Settings.pause))"
-    Write-Host "2. Change Seed ($($Settings.seed))"
-    Write-Host "3. Change Loop Count ($($Settings.LoopCount))"
-    Write-Host "4. Setup OpenAI"
-    Write-Host "5. Plugin Settings"
-    Write-Host "6. Advanced Settings"
-    Write-Host "7. Turn On Debug ($($Settings.Debug))"
-    Write-Host "8. Exit"
+
+
+function ConfigureStableLMIntegration {
+    $useOpenAI = Read-Host "Do you want to use StableLM (Uses 'StableLM/run.bat' and please follow the setup.bat for setup of StableLM.) ? (y/n)"
+    if ($useOpenAI -eq "y") {
+        Write-Host "StableLM Model List:" -ForegroundColor Green
+        $slmModels = @("stablelm-base-alpha-3b", "stablelm-tuned-alpha-3b", "stablelm-base-alpha-7b", "stablelm-tuned-alpha-7b")
+        $slmType = @(0, 0, 1, 1)
+
+        for ($i = 0; $i -lt $slmModels.Count; $i++) {
+            Write-Host "$($i + 1). $($slmModels[$i])"
+        }
+
+        $selectedIndex = Read-Host "Select a model from the list (1-$($oaModels.Count))"
+        $selectedModel = $oaModels[$selectedIndex - 1]
+        $selectedType = $slmType;
+
+
+        $selectedChunkSize = Read-Host "How many Chunks for the Prompt? (64)"
+        $selectedMaxTokens = Read-Host "How many Max Tokens for Output? (64)"
+
+        $Settings.UseOnlineGPT = $false
+
+        if ($slmType -eq 0) {
+            $comdStr = ".\StableLM\run.bat -c $($selectedChunkSize) -t $($selectedMaxTokens) -clear -p [user]"
+            $Settings.SendOnlyPromptToGPT = $true;
+        } else {
+            $comdStr = ".\StableLM\run.bat -c $($selectedChunkSize) -t $($selectedMaxTokens) -clear -s [system] -u [user]"
+            $Settings.SendOnlyPromptToGPT = $false;
+            $Settings.GPTPromptScheme = "<|SYSTEM|>[system]<|USER|>[user]<|ASSISTANT|>"
+        }
+
+        $Settings.LocalGPTPath = $comdStr;
+    }
+
+
 }
 
-function ConfigureOpenAIIntegration {
-    $changeKey = Read-Host "Do you want to change your OpenAI Key? (y/n)"
-    if ($changeKey -eq "y") {
-        $optData = Read-Host "Enter your OpenAI Key"
-        $encData = Encrypt-String-Auto -InputString $optData
-        $Settings.OnlineAPIKey = $encData
-    }
-
-    $Settings.UseOnlineGPT = $true
-    $Settings.SendOnlyPromptToGPT = $false
-
-    for ($i = 0; $i -lt $oaModels.Count; $i++) {
-        Write-Host "$($i + 1). $($oaModels[$i])"
-    }
-
-    $selectedIndex = Read-Host "Select a model from the list (1-$($oaModels.Count))"
-    $selectedModel = $oaModels[$selectedIndex - 1]
-    $Settings.UseOpenAIGPTAuthentication = $true
-
-    if ($selectedModel -eq "text-davinci-003") {
-        $Settings.OnlineGPTPath = "https://api.openai.com/v1/completions"
-        $data = @{
-            "model"        = "text-davinci-003"
-            "prompt"       = "[system] [user]"
-            "max_tokens"   = 50
-            "n"            = 1
-            "stop"         = "\n"
-            "temperature"  = 0.7
-        }
-
-        $Settings.GPTPromptScheme = $data | ConvertTo-Json -Depth 10
-    } else {
-        $Settings.OnlineGPTPath = "https://api.openai.com/v1/chat/completions"
-        $data = @{
-            "model"    = $selectedModel
-            "messages" = @(
-                @{
-                    "role"    = "system"
-                    "content" = "[system]"
-                },
-                @{
-                    "role"    = "user"
-                    "content" = "[user]"
-                }
-            )
-        }
-
-        $Settings.GPTPromptScheme = $data | ConvertTo-Json -Depth 10
-    }
-
+function ConfigureDallEIntegration {
     $useDALLE = Read-Host "Do you want to use DALLE? (y/n)"
     if ($useDALLE -eq "y") {
         $Settings.UseOpenAIDALLEAuthentication = $true
@@ -296,11 +273,83 @@ function ConfigureOpenAIIntegration {
 
         $settings.TextToImagePromptScheme = $data | ConvertTo-Json -Depth 10
     }
-
-    # Save the updated settings
-    $Settings | ConvertTo-Json -Depth 10 | Set-Content -Path "settings.json"
 }
 
+function ConfigureOpenAIIntegration {
+    $useOpenAI = Read-Host "Do you want to use OnlineAI ChatGPT? (y/n)"
+    if ($useOpenAI -eq "y") {
+        $changeKey = Read-Host "Do you want to change your OpenAI Key? (y/n)"
+        if ($changeKey -eq "y") {
+            $optData = Read-Host "Enter your OpenAI Key"
+            $encData = Encrypt-String-Auto -InputString $optData
+            $Settings.OnlineAPIKey = $encData
+        }
+
+        Write-Host "OpenAI Model List:" -ForegroundColor Green
+
+        for ($i = 0; $i -lt $oaModels.Count; $i++) {
+            Write-Host "$($i + 1). $($oaModels[$i])"
+        }
+
+        $selectedIndex = Read-Host "Select a model from the list (1-$($oaModels.Count))"
+        $selectedModel = $oaModels[$selectedIndex - 1]
+
+        $Settings.UseOpenAIGPTAuthentication = $true
+        $Settings.UseOnlineGPT = $true
+        $Settings.SendOnlyPromptToGPT = $false
+
+        if ($selectedModel -eq "text-davinci-003") {
+            $Settings.OnlineGPTPath = "https://api.openai.com/v1/completions"
+            $data = @{
+                "model"        = "text-davinci-003"
+                "prompt"       = "[system] [user]"
+                "max_tokens"   = 50
+                "n"            = 1
+                "stop"         = "\n"
+                "temperature"  = 0.7
+            }
+
+            $Settings.GPTPromptScheme = $data | ConvertTo-Json -Depth 10
+        } else {
+            $Settings.OnlineGPTPath = "https://api.openai.com/v1/chat/completions"
+            $data = @{
+                "model"    = $selectedModel
+                "messages" = @(
+                    @{
+                        "role"    = "system"
+                        "content" = "[system]"
+                    },
+                    @{
+                        "role"    = "user"
+                        "content" = "[user]"
+                    }
+                )
+            }
+
+            $Settings.GPTPromptScheme = $data | ConvertTo-Json -Depth 10
+        }
+
+
+        ConfigureDallEIntegration
+
+        # Save the updated settings
+        $Settings | ConvertTo-Json -Depth 10 | Set-Content -Path "settings.json"
+    }
+}
+
+function ShowOptions {
+    Write-Host "Basic Settings:" -ForegroundColor Green
+    Write-Host "1. Toggle Pause ($($Settings.pause))"
+    Write-Host "2. Change Seed ($($Settings.seed))"
+    Write-Host "3. Change Loop Count ($($Settings.LoopCount))"
+    Write-Host "4. Setup OpenAI"
+    Write-Host "5. Setup StableLM"
+    Write-Host "6. Setup DallE"
+    Write-Host "7. Plugin Settings"
+    Write-Host "8. Advanced Settings"
+    Write-Host "9. Turn On Debug ($($Settings.Debug))"
+    Write-Host "10. Exit"
+}
 
 
 while ($true) {
@@ -311,9 +360,10 @@ while ($true) {
         1 { $Settings.pause = if ($Settings.pause -eq 'y') { 'n' } else { 'y' } }
         2 { $Settings.seed = Read-Host "Enter the seed value (leave empty to use seed created on start, or '0' for random every time)" }
         3 { $Settings.LoopCount = Read-Host "Enter the Loop Count (leave empty for infinite)" }
-        
         4 { ConfigureOpenAIIntegration }
-        5 {
+        5 { ConfigureStableLMIntegration }
+        6 { ConfigureDallEIntegration }
+        7 {
             $pluginFiles = ShowPluginSettings
             $pluginIndex = 0
             $input = Read-Host "Enter the number of the plugin you want to configure (1-$($pluginFiles.Count))"
@@ -325,9 +375,10 @@ while ($true) {
                 Write-Host "Invalid plugin selection"
             }
         }
-        6 { ConfigureAdvancedOptions }
-        7 { $Settings.Debug = -not $Settings.Debug }
-        8 { return }
+        
+        8 { ConfigureAdvancedOptions }
+        9 { $Settings.Debug = -not $Settings.Debug }
+        10 { return }
         default { Write-Host "Invalid option" }
     }
 

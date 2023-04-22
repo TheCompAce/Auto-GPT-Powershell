@@ -1,35 +1,40 @@
 function Invoke-StableDiff {
-    Param(
-        [string]$prompt,
-        [string]$response,
-        [string]$system
+    param(
+        [string]$prompt
     )
 
-    $exeStr = PrepareRequestBody -scheme $settings.LocalGPTPath -system $system -user $prompt -seed $settings.seed
-    Write-Host $exeStr
-    $currentFolder = Get-Location
-    Write-Host "Current folder: $currentFolder"
-
-    $argArray = @( )
-
-    $argRegex = '(?<=\s|^)[^"\s]+(?=\s|$)|"(?:\\"|[^"])+?(?<!\\)"'
-    $matches = [regex]::Matches($exeStr, $argRegex)
-
-    foreach ($match in $matches) {
-        $argArray += $match.Value
+    if ($settings.UseOpenAIDALLEAuthentication) {
+        $openAIDalleDecyData = Decrypt-String-Auto -InputString $settings.OnlineAPIKey
+        $headers = @{
+            "Content-Type"  = "application/json"
+            "Authorization" = "Bearer $($openAIDalleDecyData)"
+        }
+    } else {
+        $headers = @{
+            "Content-Type"  = "application/json"
+        }
     }
 
-    $exePath = $argArray[0]
-    $argArray = $argArray | Select-Object -Skip 1
+    if ($settings.UseOnlineTextToImage) {
+        $uri = $settings.OnlineTextToImagePath
+    } else {
+        Write-Host "Please set the OnlineTextToImagePath in the settings." -ForegroundColor Red
+        return
+    }
 
-    $argString = [string]::Join(' ', $argArray)
+    $body = PrepareRequestBody -scheme $settings.TextToImagePromptScheme -system $system -user $prompt -seed $settings.seed
 
-    $tempOutputFile = New-TemporaryFile
-    # Run the executable with the arguments string and redirect output to the temporary file
-    Start-Process -FilePath "`"$exePath`"" -ArgumentList $argString -RedirectStandardOutput $tempOutputFile -NoNewWindow -Wait
-
-    $response = Get-Content -Path $tempOutputFile -Raw
-    Remove-Item -Path $tempOutputFile.FullName -Force -ErrorAction SilentlyContinue
-
-    return $response
+    try {
+        $dalleResponse = Invoke-RestMethod -Method "POST" -Uri $uri -Headers $headers -Body $body
+        if ($dalleResponse -ne $null) {
+            return $dalleResponse
+        } else {
+            Write-Host "Invoke-DallEAPI Error: Dall-E API response is empty." -ForegroundColor Red
+            return $null
+        }
+    }
+    catch {
+        Write-Host "Invoke-DallEAPI Error: $($_.Exception.Message)" -ForegroundColor Red
+        return $null
+    }
 }

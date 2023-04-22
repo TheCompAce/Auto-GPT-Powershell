@@ -43,7 +43,7 @@ if ($seed) { $settings.seed = $seed }
 if ($LoopCount) { $settings.LoopCount = $LoopCount }
 if ($Debug) { $settings.Debug = $Debug }
 
-$checkOptions = Read-Host "Do you want to check options? (y)es/(n)o"
+$checkOptions = Read-Host "Do you want to change the options? (y)es/(n)o"
 if ($checkOptions.ToLower() -eq 'y') {
     . .\module\main\Options.ps1 -Settings $Settings
     # Reload settings
