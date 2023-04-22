@@ -81,7 +81,10 @@ For the base setup of each plugin type, see the scripts provided in the "plugins
 
 ## Contribute 🤝
 
-We welcome contributions to the AutoGPT_PS project! There are many ways to get involved:
+If you would like to Contribute, and join the project, please see https://github.com/TheCompAce/Auto-GPT-Powershell/discussions/10
+
+If you want to Donate Money check out https://github.com/TheCompAce/Auto-GPT-Powershell/discussions/11
+
 
 ## Credits 🏆
 - "gpt4all-lora-quantized-win64.exe" is used from https://github.com/nomic-ai/gpt4all
