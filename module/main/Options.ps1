@@ -235,18 +235,16 @@ function ConfigureStableLMIntegration {
         $Settings.UseOnlineGPT = $false
 
         if ($slmType -eq 0) {
-            $comdStr = ".\StableLM\run.bat -c $($selectedChunkSize) -t $($selectedMaxTokens) -clear -p [user]"
+            $comdStr = ".\StableLM\run.bat -c $($selectedChunkSize) -t $($selectedMaxTokens) -m $($slmModels) -clear -p [user]"
             $Settings.SendOnlyPromptToGPT = $true;
         } else {
-            $comdStr = ".\StableLM\run.bat -c $($selectedChunkSize) -t $($selectedMaxTokens) -clear -s [system] -u [user]"
+            $comdStr = ".\StableLM\run.bat -c $($selectedChunkSize) -t $($selectedMaxTokens) -m $($slmModels) -clear -s [system] -u [user]"
             $Settings.SendOnlyPromptToGPT = $false;
             $Settings.GPTPromptScheme = "<|SYSTEM|>[system]<|USER|>[user]<|ASSISTANT|>"
         }
 
         $Settings.LocalGPTPath = $comdStr;
     }
-
-
 }
 
 function ConfigureDallEIntegration {
