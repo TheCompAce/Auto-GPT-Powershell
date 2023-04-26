@@ -15,10 +15,10 @@ function Invoke-DallEAPI {
         }
     }
 
-    if ($settings.UseOnlineTextToImage) {
-        $uri = $settings.OnlineTextToImagePath
+    if ($settings.UseDalleTextToImage) {
+        $uri = $Settings.TextToImagePath
     } else {
-        Write-Host "Please set the OnlineTextToImagePath in the settings." -ForegroundColor Red
+        Write-Host "Please set the UseDalleTextToImage in the settings." -ForegroundColor Red
         return
     }
 

@@ -16,8 +16,9 @@ function Get-UniqueFilename {
     while ($true) {
         Start-Sleep -Milliseconds 10
         $newFilename = "{0}({1}){2}" -f $baseName, $number, $extension
-        if (-not (Test-Path $newFilename)) {
-            return Join-Path $folder $newFilename
+        $newFilePath = Join-Path $folder $newFilename
+        if (-not (Test-Path $newFilePath)) {
+            return $newFilePath
         }
         $number++
     }
@@ -61,6 +62,23 @@ function ClearTempFolder {
     if (Test-Path $tempFolderPath) {
         Remove-Item -Path $tempFolderPath\* -Recurse -Force
     }
+}
+
+function Write-Log {
+    Param(
+        [string]$logText
+    )
+
+    $logFile = Join-Path $global:SessionFolder 'system.log'
+
+    # Get the current date and time
+    $currentDateTime = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
+
+    # Create the log entry
+    $logEntry = "[$currentDateTime] $logText"
+
+    # Append the log entry to the system.log file
+    Add-Content -Path $logFile -Value $logEntry
 }
 
 
@@ -311,6 +329,9 @@ function MergeAndSaveProperties {
     return $updatedProperties
 }
 
+
+
+
 function UpdateSettingsWithDefaults {
     Param (
         $Settings
@@ -318,15 +339,15 @@ function UpdateSettingsWithDefaults {
 
     $properties = @{
         Version                   = "0.1.0"
-        LocalGPTPath              = ".\gpt4all-lora-quantized-win64.exe -m gpt4all-lora-quantized.bin -n 1000 -c 4000 -s [seed] -f [userFile]"
-        OnlineGPTPath             = ""
+        GPTPath              = ".\GPT4All\run.bat -m gpt4all-lora-quantized.bin -n 1000 -c 4000 -s [seed] -f [userFile]"
         UseOnlineGPT              = $false
         SendOnlyPromptToGPT       = $true
         GPTPromptScheme           = ""
         UseOpenAIGPTAuth          = $false
-        LocalTextToImagePath      = ""
+        TextToImagePath           = ""
         OnlineTextToImagePath     = ""
-        UseOnlineTextToImage      = $false
+        UseDalleTextToImage      = $false
+        UseStableDiffTextToImage      = $false
         SendOnlyPromptToTextToImage = $false
         TextToImagePromptScheme   = ""
         UseOpenAIDalleAuth        = $false
@@ -337,6 +358,10 @@ function UpdateSettingsWithDefaults {
         Debug                     = $false
         UseOpenAIDALLEAuthentication = $False
         UseOpenAIGPTAuthentication = $false
+        SpeechPath = ""
+        UseOnlineSpeechSynthesis = $False
+        SpeechSynthesisScheme = ""
+        UseOpenAISpeechSynthesisAuthentication = $False
     }
 
     if (-not (Test-Path "settings.json")) {

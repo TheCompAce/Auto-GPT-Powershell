@@ -18,7 +18,7 @@ Param(
     [bool]$UseOpenAIGPTAuth,
     [string]$LocalTextToImagePath,
     [string]$OnlineTextToImagePath,
-    [bool]$UseOnlineTextToImage,
+    [bool]$UseDalleTextToImage,
     [bool]$SendOnlyPromptToTextToImage,
     [string]$TextToImagePromptScheme,
     [bool]$UseOpenAIDalleAuth,
@@ -26,6 +26,8 @@ Param(
     [bool]$UseOpenAIDALLEAuthentication,
     [bool]$UseOpenAIGPTAuthentication
 )
+
+$global:scriptPath = Split-Path -Path $MyInvocation.MyCommand.Definition -Parent
 
 . .\module\main\Crypt.ps1
 . .\module\main\General.ps1
@@ -59,6 +61,8 @@ Remove-Item -Path "system.log" -ErrorAction Ignore
 . .\module\main\RunChatGPTAPI.ps1
 . .\module\main\RunGPT4Exe.ps1
 . .\module\main\RunDallEAPI.ps1
+. .\module\main\RunBarkExe.ps1
+. .\module\main\RunStableDiffAPI.ps1
 
 # Set initial prompt
 $prompt = Read-Host "Enter the starting prompt"

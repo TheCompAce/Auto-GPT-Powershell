@@ -144,36 +144,40 @@ function ConfigurePlugin {
 
 function ShowAdvancedOptions {
     Write-Host "Advanced Settings:" -ForegroundColor Green
-    Write-Host "1. Local GPT Path ($($Settings.LocalGPTPath))"
-    Write-Host "2. Online GPT Path ($($Settings.OnlineGPTPath))"
-    Write-Host "3. Use Online GPT ($($Settings.UseOnlineGPT))"
-    Write-Host "4. Send only Prompt to GPT ($($Settings.SendOnlyPromptToGPT))"
-    Write-Host "5. Set GPT Prompt Scheme (Import File Data)"
-    Write-Host "6. Show GPT Prompt Scheme"
-    Write-Host "7. Use OpenAI GPT Authentication ($($Settings.UseOpenAIGPTAuthentication))"
-    Write-Host "8. Local Text To Image Path ($($Settings.LocalTextToImagePath))"
-    Write-Host "9. Online Text To Image Path ($($Settings.OnlineTextToImagePath))"
-    Write-Host "10. Use Online Text To Image ($($Settings.UseOnlineTextToImage))"
-    Write-Host "11. Send only Prompt to Text To Image ($($Settings.SendOnlyPromptToTextToImage))"
-    Write-Host "12. Set Text To Image Prompt Scheme (Import File Data)"
-    Write-Host "13. Show Text To Image Prompt Scheme"
-    Write-Host "14. Use OpenAI DALLE Authentication ($($Settings.UseOpenAIDALLEAuthentication))"
-    Write-Host "15. Set OpenAI API Key"
-    Write-Host "16. Exit"
+    Write-Host "1. GPT Path ($($Settings.GPTPath))"
+    Write-Host "2. Use Online GPT ($($Settings.UseOnlineGPT))"
+    Write-Host "3. Send only Prompt to GPT ($($Settings.SendOnlyPromptToGPT))"
+    Write-Host "4. Set GPT Prompt Scheme (Import File Data)"
+    Write-Host "5. Show GPT Prompt Scheme"
+    Write-Host "6. Use OpenAI GPT Authentication ($($Settings.UseOpenAIGPTAuthentication))"
+    Write-Host "7. Text To Image Path ($($Settings.TextToImagePath))"
+    Write-Host "8. Use Dall-E Text To Image ($($Settings.UseDalleTextToImage))"
+    Write-Host "9. Use Stable Diffusion Text To Image ($($Settings.UseStableDiffTextToImage))"    
+    Write-Host "10. Send only Prompt to Text To Image ($($Settings.SendOnlyPromptToTextToImage))"
+    Write-Host "11. Set Text To Image Prompt Scheme (Import File Data)"
+    Write-Host "12. Show Text To Image Prompt Scheme"
+    Write-Host "13. Use OpenAI DALLE Authentication ($($Settings.UseOpenAIDALLEAuthentication))"
+    Write-Host "14. Set OpenAI API Key"
+    Write-Host "15. Speech Path ($($Settings.SpeechPath))"
+    Write-Host "16. Use Online Speech Synthesis ($($Settings.UseOnlineSpeechSynthesis))"
+    Write-Host "17. Use Prompt for Speech Synthesis ($($Settings.UsePromptForSpeechSynthesis))"
+    Write-Host "18. Speech Synthesis Scheme (Import File Data)"
+    Write-Host "19. Show Speech Synthesis Scheme"
+    Write-Host "20. Set OpenAI Speech Synthesis Authentication ($($Settings.UseOpenAISpeechSynthesisAuthentication))"
+    Write-Host "21. Exit"
     Write-Host "Note: [system] for System Prompt, [user] for User Prompt, [systemFile] to save System Prompt to a file, [userFile] to save User Prompt to a file, [seed] for sending a seed value, can be used in Paths, and Schemes"
 }
 
 function ConfigureAdvancedOptions {
     while ($true) {
         ShowAdvancedOptions
-        $option = Read-Host "Choose an option (1-16):"
+        $option = Read-Host "Choose an option (1-20):"
 
         switch ($option) {
-            1 { $Settings.LocalGPTPath = Read-Host "Enter the Local GPT Path" }
-            2 { $Settings.OnlineGPTPath = Read-Host "Enter the Online GPT Path" }
-            3 { $Settings.UseOnlineGPT = -not $Settings.UseOnlineGPT }
-            4 { $Settings.SendOnlyPromptToGPT = -not $Settings.SendOnlyPromptToGPT }
-            5 {
+            1 { $Settings.GPTPath = Read-Host "Enter the GPT Path" }
+            2 { $Settings.UseOnlineGPT = -not $Settings.UseOnlineGPT }
+            3 { $Settings.SendOnlyPromptToGPT = -not $Settings.SendOnlyPromptToGPT }
+            4 {
                 $GPTPromptSchemeFile = Read-Host "Enter the GPT Prompt Scheme file path"
                 try {
                     $Settings.GPTPromptScheme = Get-Content -Path $GPTPromptSchemeFile -Raw
@@ -181,13 +185,14 @@ function ConfigureAdvancedOptions {
                     Write-Host "Error: Unable to set GPT Prompt Scheme file path." -ForegroundColor Red
                 }
             }
-            6 { Write-Host "GPT Prompt Scheme:" -ForegroundColor Green; Write-Host $Settings.GPTPromptScheme }
-            7 { $Settings.UseOpenAIGPTAuthentication = -not $Settings.UseOpenAIGPTAuthentication }
-            8 { $Settings.LocalTextToImagePath = Read-Host "Enter the Local Text To Image Path" }
-            9 { $Settings.OnlineTextToImagePath = Read-Host "Enter the Online Text To Image Path" }
-            10 { $Settings.UseOnlineTextToImage = -not $Settings.UseOnlineTextToImage }
-            11 { $Settings.SendOnlyPromptToTextToImage = -not $Settings.SendOnlyPromptToTextToImage }
-            12 {
+            5 { Write-Host "GPT Prompt Scheme:" -ForegroundColor Green; Write-Host $Settings.GPTPromptScheme }
+            6 { $Settings.UseOpenAIGPTAuthentication = -not $Settings.UseOpenAIGPTAuthentication }
+            7 { $Settings.TextToImagePath = Read-Host "Enter the Text To Image Path" }
+            8 { $Settings.UseDalleTextToImage = -not $Settings.UseDalleTextToImage }
+            9 { $Settings.UseStableDiffTextToImage = -not $Settings.UseStableDiffTextToImage }
+            
+            10 { $Settings.SendOnlyPromptToTextToImage = -not $Settings.SendOnlyPromptToTextToImage }
+            11 {
                 $TextToImagePromptSchemeFile = Read-Host "Enter the Text To Image Prompt Scheme file path"
                 try {
                     $Settings.TextToImagePromptScheme = Get-Content -Path $TextToImagePromptSchemeFile -Raw
@@ -195,14 +200,27 @@ function ConfigureAdvancedOptions {
                     Write-Host "Error: Unable to set Image Prompt Scheme file path." -ForegroundColor Red
                 }
             }
-            13 { Write-Host "Text To Image Prompt Scheme:" -ForegroundColor Green; Write-Host $Settings.TextToImagePromptScheme }
-            14 { $Settings.UseOpenAIDALLEAuthentication = -not $Settings.UseOpenAIDALLEAuthentication }
-            15 { 
-                    $optData = Read-Host "Enter the Online API Key" 
-                    $encData = Encrypt-String-Auto -InputString $optData
-                    $Settings.OnlineAPIKey = $encData
+            12 { Write-Host "Text To Image Prompt Scheme:" -ForegroundColor Green; Write-Host $Settings.TextToImagePromptScheme }
+            13 { $Settings.UseOpenAIDALLEAuthentication = -not $Settings.UseOpenAIDALLEAuthentication }
+            14 { 
+                $optData = Read-Host "Enter the Online API Key" 
+                $encData = Encrypt-String-Auto -InputString $optData
+                $Settings.OnlineAPIKey = $encData
+            }
+            15 { $Settings.SpeechPath = Read-Host "Enter the Speech Path" }
+            16 { $Settings.UseOnlineSpeechSynthesis = -not $Settings.UseOnlineSpeechSynthesis }
+            17 { $Settings.UsePromptForSpeechSynthesis = -not $Settings.UsePromptForSpeechSynthesis }
+            18 {
+                $SpeechSynthesisSchemeFile = Read-Host "Enter the Speech Synthesis Scheme file path"
+                try {
+                    $Settings.SpeechSynthesisScheme = Get-Content -Path $SpeechSynthesisSchemeFile -Raw
+                } catch {
+                    Write-Host "Error: Unable to set Speech Synthesis Scheme file path." -ForegroundColor Red
                 }
-            16 { return }
+            }
+            19 { Write-Host "Speech Synthesis Scheme:" -ForegroundColor Green; Write-Host $Settings.SpeechSynthesisScheme }
+            20 { $Settings.UseOpenAISpeechSynthesisAuthentication = -not $Settings.UseOpenAISpeechSynthesisAuthentication }
+            21 { return }
             default { Write-Host "Invalid option" }
         }
 
@@ -211,10 +229,219 @@ function ConfigureAdvancedOptions {
     }
 }
 
+function FindPropertyIndexByName {
+    Param(
+        [array]$properties,
+        [string]$propertyName
+    )
+
+    for ($i = 0; $i -lt $properties.Count; $i++) {
+        if ($properties[$i]['Name'] -eq $propertyName) {
+            return $i
+        }
+    }
+
+    return -1 # Return -1 if the property is not found
+}
+
+function ConfigureStableDiffusionEIntegration {
+    $useDALLE = Read-Host "Do you want to use Stable Diffusion? (y/n)"
+    if ($useDALLE -eq "y") {
+        $pluginName = "./plugins/Output_DallE_Prompts.ps1"
+        $properties = & $pluginName -FunctionName "GetProperties"
+
+        $Settings.UseOpenAIDALLEAuthentication = $true
+        $Settings.UseDalleTextToImage = $false
+        $settings.UseStableDiffTextToImage = $true
+        $Settings.TextToImagePath = "http://127.0.0.1:7860/sdapi/v1/txt2img"
+
+        $propertyName = "StableDiffusion_png_info_url"
+        $propertyIndex = FindPropertyIndexByName -properties $properties -propertyName $propertyName
+        if ($propertyIndex -ge 0) {
+            $properties[$propertyIndex]["Value"] = "http://127.0.0.1:7860/sdapi/v1/png-info"
+        } else {
+            Write-Host "The property '$propertyName' was not found"
+        }
+        
+
+        $sizeOptions = @("256x256", "512x512", "1024x1024")
+
+        for ($i = 0; $i -lt $sizeOptions.Count; $i++) {
+            Write-Host "$($i + 1). $($sizeOptions[$i])"
+        }
+
+        [int]$sizeIndex = Read-Host "Select a size from the list (1-$($sizeOptions.Count))"
+
+        $setSzie = 256
+        if ($sizeIndex -eq 2) {
+            $setSzie = 512
+        } elseif ($sizeIndex -eq 3) {
+            $setSzie = 1024
+        }
+
+        $propertyName = "StableDiffusion_width"
+        $propertyIndex = FindPropertyIndexByName -properties $properties -propertyName $propertyName
+        if ($propertyIndex -ge 0) {
+            $properties[$propertyIndex]["Value"] = $setSzie
+        } else {
+            Write-Host "The property '$propertyName' was not found"
+        }
+        
+
+        $propertyName = "StableDiffusion_height"
+        $propertyIndex = FindPropertyIndexByName -properties $properties -propertyName "$propertyName"
+        if ($propertyIndex -ge 0) {
+            $properties[$propertyIndex]["Value"] = $setSzie
+        } else {
+            Write-Host "The property '$propertyName' was not found"
+        }
+        
+
+        $useRestorFaces = Read-Host "So you want to turn on Restore Faces (y)es/(n)o"
+
+        if ($useRestorFaces -eq "y") {
+            $setRestoreFaces = $true
+        } else {
+            $setRestoreFaces = $false
+        }
+
+        $propertyName = "StableDiffusion_restore_faces"
+        $propertyIndex = FindPropertyIndexByName -properties $properties -propertyName "$propertyName"
+        if ($propertyIndex -ge 0) {
+            $properties[$propertyIndex]["Value"] = $setRestoreFaces
+        } else {
+            Write-Host "The property '$propertyName' was not found"
+        }
+        
+
+        <# $useHiRes = Read-Host "So you want to turn on Hi Res (y)es/(n)o"
+
+        if ($useHiRes -eq "y") {
+            $setHiRes = $true
+        } else {
+            $setHiRes = $false
+        }
+
+        $propertyName = "StableDiffusion_enable_hr"
+        $propertyIndex = FindPropertyIndexByName -properties $properties -propertyName "$propertyName"
+        if ($propertyIndex -ge 0) {
+            $properties[$propertyIndex]["Value"] = $setHiRes
+        } else {
+            Write-Host "The property '$propertyName' was not found"
+        }
+        
+
+        if ($setHiRes) {
+            $useHiResScaler = Read-Host "Do you want to use scale for resize? (y)es/(n)o"
+
+            if ($useHiResScaler -eq "y") {
+                $setHiResScaler = $true
+                [int]$scalMultiplier = Read-Host "What Scale do you want (1-?)"
+
+                if ($scalMultiplier -gt 0) {
+                    $propertyName = "StableDiffusion_hr_scale"
+                    $propertyIndex = FindPropertyIndexByName -properties $properties -propertyName "$propertyName"
+                    if ($propertyIndex -ge 0) {
+                        $properties[$propertyIndex]["Value"] = $scalMultiplier 
+                    } else {
+                        Write-Host "The property '$propertyName' was not found"
+                    }
+
+                    $propertyName = "StableDiffusion_hr_resize_x"
+                    $propertyIndex = FindPropertyIndexByName -properties $properties -propertyName $propertyName
+                    if ($propertyIndex -ge 0) {
+                        $properties[$propertyIndex]["Value"] = 0
+                    } else {
+                        Write-Host "The property '$propertyName' was not found"
+                    }
+
+                    $propertyName = "StableDiffusion_hr_resize_y"
+                    $propertyIndex = FindPropertyIndexByName -properties $properties -propertyName "$propertyName"
+                    if ($propertyIndex -ge 0) {
+                        $properties[$propertyIndex]["Value"] = 0
+                    } else {
+                        Write-Host "The property '$propertyName' was not found"
+                    }
+                }
+            } else {
+                $setHiResScaler = $false
+                [int]$hiResWidth = Read-Host "What Width do you want"
+
+                if ($hiResWidth -gt 0) {
+                    $propertyName = "StableDiffusion_hr_resize_x"
+                    $propertyIndex = FindPropertyIndexByName -properties $properties -propertyName "$propertyName"
+                    if ($propertyIndex -ge 0) {
+                        $properties[$propertyIndex]["Value"] = $hiResWidth
+                    } else {
+                        Write-Host "The property '$propertyName' was not found"
+                    }
+                }
+
+                [int]$hiResHeight = Read-Host "What Width do you want"
+
+                if ($hiResHeight -gt 0) {
+                    $propertyName = "StableDiffusion_hr_resize_y"
+                    $propertyIndex = FindPropertyIndexByName -properties $properties -propertyName "$propertyName"
+                    if ($propertyIndex -ge 0) {
+                        $properties[$propertyIndex]["Value"] = $hiResHeight
+                    } else {
+                        Write-Host "The property '$propertyName' was not found"
+                    }
+                }
+            }
+
+            $propertyName = "StableDiffusion_enable_hr"
+            $propertyIndex = FindPropertyIndexByName -properties $properties -propertyName "$propertyName"
+            if ($propertyIndex -ge 0) {
+                $properties[$propertyIndex]["Value"] = $setHiRes
+            } else {
+                Write-Host "The property '$propertyName' was not found"
+            }
+        } #>
+        
+        $SetName = & $pluginName -FunctionName "GetFullName"
+        SavePluginPropertiesToFile -pluginName $SetName -properties $properties
+        # return $properties
+    }
+}
+
+
+function ConfigureBarkIntegration {
+    $useOpenAI = Read-Host "Do you want to use Bark (Uses 'Bark/run.bat' and please follow the Bark/setup.bat for setup) ? (y/n)"
+    if ($useOpenAI -eq "y") {
+        $selectedSmallTextModel = Read-Host "Use small text model (y)es/(n)o"
+        $setExec = ""
+        if ($selectedSmallTextModel -eq "y") {
+            $setExec += "--text_use_small "
+        }
+
+        $selectedSmallCoarseModel = Read-Host "Use small coarse model (y)es/(n)o"
+        if (!$selectedSmallTextModel -eq "y") {
+            $setExec += "--coarse_use_small "
+        }
+
+        $selectedGPUFile = Read-Host "Use GPU for fine model (y)es/(n)o"
+        if (!$selectedSmallTextModel -eq "y") {
+            $setExec += "--fine_use_gpu "
+        }
+
+        $selectedSmallFineModel = Read-Host "Use small fine model (y)es/(n)o"
+        if ($selectedSmallTextModel -eq "y") {
+            $setExec += "--fine_use_small "
+        }
+
+        
+        $exePath = Resolve-Path -Path (Join-Path -Path $global:scriptPath -ChildPath "bark\run.bat")
+        
+        $setExec = "$($exePath) -p `"[user]`" -f `"[file]`" -v [voice] $($setExec)"
+    }
+
+    $Settings.SpeechPath = $setExec
+}
 
 
 function ConfigureStableLMIntegration {
-    $useOpenAI = Read-Host "Do you want to use StableLM (Uses 'StableLM/run.bat' and please follow the setup.bat for setup of StableLM.) ? (y/n)"
+    $useOpenAI = Read-Host "Do you want to use StableLM (Uses 'StableLM/run.bat' and please follow the StableLM/setup.bat for setup) ? (y/n)"
     if ($useOpenAI -eq "y") {
         Write-Host "StableLM Model List:" -ForegroundColor Green
         $slmModels = @("stablelm-base-alpha-3b", "stablelm-tuned-alpha-3b", "stablelm-base-alpha-7b", "stablelm-tuned-alpha-7b")
@@ -251,8 +478,9 @@ function ConfigureDallEIntegration {
     $useDALLE = Read-Host "Do you want to use DALLE? (y/n)"
     if ($useDALLE -eq "y") {
         $Settings.UseOpenAIDALLEAuthentication = $true
-        $Settings.UseOnlineTextToImage = $true
-        $Settings.OnlineTextToImagePath = "https://api.openai.com/v1/images/generations"
+        $Settings.UseDalleTextToImage = $true
+        $settings.UseStableDiffTextToImage = $false
+        $Settings.TextToImagePath = "https://api.openai.com/v1/images/generations"
 
         $sizeOptions = @("256x256", "512x512", "1024x1024")
 
@@ -297,7 +525,7 @@ function ConfigureOpenAIIntegration {
         $Settings.SendOnlyPromptToGPT = $false
 
         if ($selectedModel -eq "text-davinci-003") {
-            $Settings.OnlineGPTPath = "https://api.openai.com/v1/completions"
+            $Settings.GPTPath = "https://api.openai.com/v1/completions"
             $data = @{
                 "model"        = "text-davinci-003"
                 "prompt"       = "[system] [user]"
@@ -309,7 +537,7 @@ function ConfigureOpenAIIntegration {
 
             $Settings.GPTPromptScheme = $data | ConvertTo-Json -Depth 10
         } else {
-            $Settings.OnlineGPTPath = "https://api.openai.com/v1/chat/completions"
+            $Settings.GPTPath = "https://api.openai.com/v1/chat/completions"
             $data = @{
                 "model"    = $selectedModel
                 "messages" = @(
@@ -336,23 +564,25 @@ function ConfigureOpenAIIntegration {
 }
 
 function ShowOptions {
-    Write-Host "Basic Settings:" -ForegroundColor Green
+    Write-Host "Basic Settings: ($($settings.Version))" -ForegroundColor Green
     Write-Host "1. Toggle Pause ($($Settings.pause))"
     Write-Host "2. Change Seed ($($Settings.seed))"
     Write-Host "3. Change Loop Count ($($Settings.LoopCount))"
     Write-Host "4. Setup OpenAI"
     Write-Host "5. Setup StableLM"
     Write-Host "6. Setup DallE"
-    Write-Host "7. Plugin Settings"
-    Write-Host "8. Advanced Settings"
-    Write-Host "9. Turn On Debug ($($Settings.Debug))"
-    Write-Host "10. Exit"
+    Write-Host "7. Setup Stable Diffusion"
+    Write-Host "8. Setup Bark"
+    Write-Host "9. Plugin Settings"
+    Write-Host "10. Advanced Settings"
+    Write-Host "11. Turn On Debug ($($Settings.Debug))"
+    Write-Host "12. Exit"
 }
 
 
 while ($true) {
     ShowOptions
-    $option = Read-Host "Choose an option (1-8):"
+    $option = Read-Host "Choose an option (1-12):"
 
     switch ($option) {
         1 { $Settings.pause = if ($Settings.pause -eq 'y') { 'n' } else { 'y' } }
@@ -361,7 +591,10 @@ while ($true) {
         4 { ConfigureOpenAIIntegration }
         5 { ConfigureStableLMIntegration }
         6 { ConfigureDallEIntegration }
-        7 {
+        7 { ConfigureStableDiffusionEIntegration }
+        8 { ConfigureBarkIntegration }
+        
+        9 {
             $pluginFiles = ShowPluginSettings
             $pluginIndex = 0
             $input = Read-Host "Enter the number of the plugin you want to configure (1-$($pluginFiles.Count))"
@@ -374,9 +607,9 @@ while ($true) {
             }
         }
         
-        8 { ConfigureAdvancedOptions }
-        9 { $Settings.Debug = -not $Settings.Debug }
-        10 { return }
+        10 { ConfigureAdvancedOptions }
+        11 { $Settings.Debug = -not $Settings.Debug }
+        12 { return }
         default { Write-Host "Invalid option" }
     }
 

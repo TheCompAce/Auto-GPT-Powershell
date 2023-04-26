@@ -19,7 +19,7 @@ function Invoke-ChatGPTAPI {
         }
     }
 
-    $uri = $settings.OnlineGPTPath
+    $uri = $Settings.GPTPath
 
     $body = PrepareRequestBody -scheme $settings.GPTPromptScheme -system $system -user $prompt -seed $settings.seed
 

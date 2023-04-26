@@ -5,7 +5,8 @@ function Invoke-GPT4ALL {
         [string]$system
     )
 
-    $exeStr = PrepareRequestBody -scheme $settings.LocalGPTPath -system $system -user $prompt -seed $settings.seed
+    
+    $exeStr = PrepareRequestBody -scheme $Settings.GPTPath -system $system -user $prompt -seed $settings.seed
     Write-Host $exeStr
     $currentFolder = Get-Location
     Write-Host "Current folder: $currentFolder"
@@ -18,6 +19,8 @@ function Invoke-GPT4ALL {
     foreach ($match in $matches) {
         $argArray += $match.Value
     }
+
+    Debug -debugText "EXE CALL: $($exeStr)"
 
     $exePath = $argArray[0]
     $argArray = $argArray | Select-Object -Skip 1
